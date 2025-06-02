@@ -1,12 +1,14 @@
 package com.example.shoppingMall.mapper;
 
 import com.example.shoppingMall.dto.request.UserCreationRequest;
+import com.example.shoppingMall.dto.request.UserUpdateRequest;
 import com.example.shoppingMall.dto.response.UserResponse;
 import com.example.shoppingMall.enums.AccountStatus;
 import com.example.shoppingMall.enums.Gender;
 import com.example.shoppingMall.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.time.LocalDate;
@@ -14,6 +16,9 @@ import java.time.format.DateTimeFormatter;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    @Mapping(target = "roles", ignore = true)
+    void toUpdateUser(@MappingTarget User user, UserUpdateRequest request);
 
     @Mapping(source = "gender", target = "gender",qualifiedByName = "stringToGender")
     @Mapping(source = "dateOfBirth", target = "dateOfBirth", qualifiedByName = "stringToLocalDate")

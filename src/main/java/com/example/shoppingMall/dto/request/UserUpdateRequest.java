@@ -1,13 +1,13 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.request;
+
 import com.example.shoppingMall.enums.AccountStatus;
 import com.example.shoppingMall.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class User {
-    private long userId;
+public class UserUpdateRequest {
     private String username;
     private String email;
     private String password;
@@ -17,13 +17,12 @@ public class User {
     private LocalDate dateOfBirth;
     private AccountStatus accountStatus;
     private Gender gender;
-    private Set<Role> roles = new HashSet<>();
+    private Set<String> roles;
 
-    public User() {
+    public UserUpdateRequest() {
     }
 
-    public User(long userId, String username, String email, String password, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<Role> roles) {
-        this.userId = userId;
+    public UserUpdateRequest(String username, String email, String password, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<String> roles) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -36,13 +35,6 @@ public class User {
         this.roles = roles;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
 
     public String getUsername() {
         return username;
@@ -116,11 +108,11 @@ public class User {
         this.gender = gender;
     }
 
-    public Set<Role> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 }

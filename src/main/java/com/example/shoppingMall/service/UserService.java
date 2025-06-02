@@ -1,15 +1,22 @@
 package com.example.shoppingMall.service;
 
+import com.example.shoppingMall.dto.request.UserUpdateRequest;
 import com.example.shoppingMall.dto.request.UserCreationRequest;
 import com.example.shoppingMall.dto.response.UserResponse;
-import com.example.shoppingMall.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    public List<UserResponse> getAllUsers();
-    public UserResponse createUser(UserCreationRequest userCreationRequest);
-    public UserResponse getUserById(long userId);
-    public void deleteUser(long userId);
+    List<UserResponse> getAllUsers();
+
+    UserResponse createUser(UserCreationRequest userCreationRequest);
+
+    UserResponse updateUser(long userId, UserUpdateRequest updateUserRequest);
+
+    UserResponse getMyInfo();
+
+    UserResponse getUserById(long userId);
+
+    void deleteUser(long userId);
 }

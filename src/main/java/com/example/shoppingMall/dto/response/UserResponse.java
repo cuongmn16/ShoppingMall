@@ -1,6 +1,10 @@
 package com.example.shoppingMall.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.util.Set;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
     private long userId;
     private String username;
@@ -11,11 +15,12 @@ public class UserResponse {
     private String dateOfBirth;
     private String accountStatus;
     private String gender;
+    private Set<RoleResponse> roles;
 
     public UserResponse() {
     }
 
-    public UserResponse(long userId, String username, String email, String fullName, String phone, String avatarUrl, String dateOfBirth, String accountStatus, String gender) {
+    public UserResponse(long userId, String username, String email, String fullName, String phone, String avatarUrl, String dateOfBirth, String accountStatus, String gender, Set<RoleResponse> roles) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -25,6 +30,7 @@ public class UserResponse {
         this.dateOfBirth = dateOfBirth;
         this.accountStatus = accountStatus;
         this.gender = gender;
+        this.roles = roles;
     }
 
     public long getUserId() {
@@ -97,5 +103,13 @@ public class UserResponse {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Set<RoleResponse> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleResponse> roles) {
+        this.roles = roles;
     }
 }
