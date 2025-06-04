@@ -33,7 +33,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     @Value("${jwt.signerKey}")
     protected  String SIGNER_KEY ;
-
+    @Override
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
 
@@ -50,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         return introspectResponse;
     }
 
-
+    @Override
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         var user = userDao.getUserByUsername(authenticationRequest.getUsername());
         if(user == null){
@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         JWTClaimsSet jwtClaimsSet  = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("shopping-mall")
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()))
                 .issueTime(new Date())
                 .claim("scope",buildScope(user))
                 .build();
@@ -99,8 +99,16 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
+            user.getRoles().forEach(role -> {
+                stringJoiner.add(role.getName());
+                if (!CollectionUtils.isEmpty(role.getPermissions())) {
+                    role.getPermissions().forEach(permission -> {
+                        stringJoiner.add(permission.getName());
+                    });
+                }
+            });
         }
+
         return stringJoiner.toString();
     }
 

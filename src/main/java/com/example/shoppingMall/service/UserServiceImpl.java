@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public List<UserResponse> getAllUsers() {
         return userDao.getAllUsers().stream().map(userMapper::toUserResponse).toList();
     }
@@ -44,6 +44,9 @@ public class UserServiceImpl implements UserService{
     public UserResponse createUser(UserCreationRequest userCreationRequest) {
         if(userDao.isUserExistsByUsername(userCreationRequest.getUsername())) {
             throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        if(userDao.isUserExistsByEmail(userCreationRequest.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
         User user = userMapper.toUser(userCreationRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -64,13 +67,9 @@ public class UserServiceImpl implements UserService{
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         userMapper.toUpdateUser(user, request);
-        if(request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
         var roles = roleDao.getAllRolesByNames(request.getRoles());
-
         user.setRoles(roles);
-        userDao.createUser(user);
+        userDao.updateUser(user);
 
         return userMapper.toUserResponse(user);
     }

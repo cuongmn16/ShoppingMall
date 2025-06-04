@@ -15,7 +15,6 @@ public class UserCreationRequest {
     private String avatarUrl;
     private String dateOfBirth;
     private String gender;
-
     public UserCreationRequest() {
     }
 

@@ -111,9 +111,15 @@ public class UserDaoImpl implements UserDao {
     public User getUserById(long userId) {
         User user = null;
         Map<Long, User> userMap = new HashMap<>();
-        String sql = "SELECT u.*, r.name, r.description FROM users u " +
+        Map<String, Role> roleMap = new HashMap<>();
+        String sql ="SELECT u.*, " +
+                "r.name AS roles_name, r.description AS role_description, " +
+                "p.name AS permissions_name, p.description AS permission_description " +
+                "FROM users u " +
                 "LEFT JOIN user_roles ur ON u.user_id = ur.user_id " +
                 "LEFT JOIN role r ON ur.roles_name = r.name " +
+                "LEFT JOIN role_permissions rp ON r.name = rp.role_name " +
+                "LEFT JOIN permission p ON rp.permissions_name = p.name " +
                 "WHERE u.user_id = ?";
         try(Connection conn = dataSource.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)){
@@ -154,12 +160,27 @@ public class UserDaoImpl implements UserDao {
                     }
                     userMap.put(userId, user);
                 }
-                String roleName = rs.getString("name");
-                String roleDescription = rs.getString("description");
+                String roleName = rs.getString("roles_name");
+                String roleDescription = rs.getString("role_description");
                 if (roleName != null && roleDescription != null) {
-                    Set<Permission> permissions = new HashSet<>();
-                    user.getRoles().add(new Role(roleName, roleDescription,permissions));
+                    Role role = roleMap.get(roleName);
+                    if(role == null){
+                        Set<Permission> permissions = new HashSet<>();
+                        role = new Role(roleName, roleDescription, permissions);
+                        roleMap.put(roleName, role);
+                        user.getRoles().add(role);
+                    }
+
+                    String permissionName = rs.getString("permissions_name");
+                    String permissionDescription = rs.getString("permission_description");
+                    if(permissionName != null && permissionDescription != null){
+                        Permission permission = new Permission();
+                        permission.setName(permissionName);
+                        permission.setDescription(permissionDescription);
+                        role.getPermissions().add(permission);
+                    }
                 }
+
             }
             return user;
         } catch (SQLException e) {
@@ -171,9 +192,15 @@ public class UserDaoImpl implements UserDao {
     public User getUserByUsername(String username) {
         User user = null;
         Map<Long, User> userMap = new HashMap<>();
-        String sql = "SELECT u.*, r.name, r.description FROM users u " +
+        Map<String, Role> roleMap = new HashMap<>();
+        String sql ="SELECT u.*, " +
+                "r.name AS roles_name, r.description AS role_description, " +
+                "p.name AS permissions_name, p.description AS permission_description " +
+                "FROM users u " +
                 "LEFT JOIN user_roles ur ON u.user_id = ur.user_id " +
                 "LEFT JOIN role r ON ur.roles_name = r.name " +
+                "LEFT JOIN role_permissions rp ON r.name = rp.role_name " +
+                "LEFT JOIN permission p ON rp.permissions_name = p.name " +
                 "WHERE u.username = ?";
 
         try(Connection conn = dataSource.getConnection();
@@ -215,11 +242,25 @@ public class UserDaoImpl implements UserDao {
                         }
                         userMap.put(userId, user);
                     }
-                    String roleName = rs.getString("name");
-                    String roleDescription = rs.getString("description");
+                    String roleName = rs.getString("roles_name");
+                    String roleDescription = rs.getString("role_description");
                     if (roleName != null && roleDescription != null) {
-                        Set<Permission> permissions = new HashSet<>();
-                        user.getRoles().add(new Role(roleName, roleDescription,permissions));
+                        Role role = roleMap.get(roleName);
+                        if(role == null){
+                            Set<Permission> permissions = new HashSet<>();
+                            role = new Role(roleName, roleDescription, permissions);
+                            roleMap.put(roleName, role);
+                            user.getRoles().add(role);
+                        }
+
+                        String permissionName = rs.getString("permissions_name");
+                        String permissionDescription = rs.getString("permission_description");
+                        if(permissionName != null && permissionDescription != null){
+                            Permission permission = new Permission();
+                            permission.setName(permissionName);
+                            permission.setDescription(permissionDescription);
+                            role.getPermissions().add(permission);
+                        }
                     }
                 }
             return user;
@@ -230,90 +271,95 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User createUser(User user) {
-        try(Connection conn = dataSource.getConnection()){
-            conn.setAutoCommit(false);
-            String sql = "INSERT INTO users (username, email, password, full_name, phone, avatar_url, date_of_birth, gender, account_status) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try(PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setString(1, user.getUsername());
-                stmt.setString(2, user.getEmail());
-                stmt.setString(3, user.getPassword());
-                stmt.setString(4, user.getFullName());
-                stmt.setString(5, user.getPhone());
-                stmt.setString(6, user.getAvatarUrl());
+        String insertUserSql = "INSERT INTO users (username, email, password, full_name, phone, avatar_url, date_of_birth, gender, account_status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String checkRoleSql = "SELECT name FROM role WHERE name IN (" +
+                String.join(",", Collections.nCopies(user.getRoles() != null ? user.getRoles().size() : 0, "?")) + ")";
+        String insertUserRoleSql = "INSERT INTO user_roles (user_id, roles_name) VALUES (?, ?)";
+
+        try (Connection conn = dataSource.getConnection()) {
+            conn.setAutoCommit(false); // Bật giao dịch
+
+            try (PreparedStatement userStmt = conn.prepareStatement(insertUserSql, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement checkRoleStmt = user.getRoles() != null && !user.getRoles().isEmpty() ? conn.prepareStatement(checkRoleSql) : null;
+                 PreparedStatement userRoleStmt = user.getRoles() != null && !user.getRoles().isEmpty() ? conn.prepareStatement(insertUserRoleSql) : null) {
+
+                // Lưu User
+                userStmt.setString(1, user.getUsername());
+                userStmt.setString(2, user.getEmail());
+                userStmt.setString(3, user.getPassword());
+                userStmt.setString(4, user.getFullName());
+                userStmt.setString(5, user.getPhone());
+                userStmt.setString(6, user.getAvatarUrl());
                 if (user.getDateOfBirth() != null) {
-                    stmt.setDate(7, Date.valueOf(user.getDateOfBirth()));
+                    userStmt.setDate(7, Date.valueOf(user.getDateOfBirth()));
                 } else {
-                    stmt.setNull(7, Types.DATE);
+                    userStmt.setNull(7, Types.DATE);
                 }
                 if (user.getGender() != null) {
-                    stmt.setString(8, user.getGender().name());
+                    userStmt.setString(8, user.getGender().name());
                 } else {
-                    stmt.setNull(8, Types.VARCHAR);
+                    userStmt.setNull(8, Types.VARCHAR);
                 }
                 if (user.getAccountStatus() != null) {
-                    stmt.setString(9, user.getAccountStatus().name());
+                    userStmt.setString(9, user.getAccountStatus().name());
                 } else {
-                    stmt.setNull(9, Types.VARCHAR);
+                    userStmt.setNull(9, Types.VARCHAR);
                 }
-                stmt.executeUpdate();
-                try(ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                userStmt.executeUpdate();
+
+                // Lấy user_id được tạo
+                try (ResultSet generatedKeys = userStmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         user.setUserId(generatedKeys.getLong(1));
-                    }else{
+                    } else {
                         throw new SQLException("Creating user failed, no ID obtained.");
                     }
                 }
-                if(user.getRoles() != null && !user.getRoles().isEmpty()){
-                    String checkRoleSql = "SELECT name FROM role WHERE name IN (" +
-                            String.join(",", Collections.nCopies(user.getRoles().size(), "?")) + ")";
-                    try(PreparedStatement checkRoleStmt = conn.prepareStatement(checkRoleSql)) {
-                        int index = 1;
-                        for (Role role : user.getRoles() ) {
-                            checkRoleStmt.setString(index++, role.getName());
-                        }
-                        ResultSet rs = checkRoleStmt.executeQuery();
-                        Set<String> foundRoles = new HashSet<>();
-                        while (rs.next()) {
-                            foundRoles.add(rs.getString("name"));
-                        }
-                        if(foundRoles.size() != user.getRoles().size()){
-                            throw new SQLException("Some roles do not exist in the database.");
-                        }
-                    }
-                    String insertRoleSql = "INSERT INTO user_roles (user_id, roles_name) VALUES (?, ?)";
-                    try(PreparedStatement insertRoleStmt = conn.prepareStatement(insertRoleSql)) {
-                        for(Role role : user.getRoles() ){
-                            insertRoleStmt.setLong(1, user.getUserId());
-                            insertRoleStmt.setString(2, role.getName());
-                            insertRoleStmt.addBatch();
-                        }
-                        stmt.executeBatch();
-                    }
-                }
-                conn.commit();
 
+                // Kiểm tra và lưu quan hệ User-Role
+                if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                    // Kiểm tra vai trò tồn tại
+                    int index = 1;
+                    for (Role role : user.getRoles()) {
+                        checkRoleStmt.setString(index++, role.getName());
+                    }
+
+                    ResultSet rs = checkRoleStmt.executeQuery();
+                    Set<String> foundRoles = new HashSet<>();
+                    while (rs.next()) {
+                        foundRoles.add(rs.getString("name"));
+                    }
+                    rs.close();
+                    if (foundRoles.size() != user.getRoles().size()) {
+                        throw new SQLException("Some roles do not exist: " +
+                                user.getRoles().stream().filter(r -> !foundRoles.contains(r)).collect(Collectors.toSet()));
+                    }
+
+                    // Chèn vào user_roles
+                    for (Role role : user.getRoles()) {
+                        userRoleStmt.setLong(1, user.getUserId());
+                        userRoleStmt.setString(2, role.getName());
+                        userRoleStmt.addBatch();
+                    }
+                    userRoleStmt.executeBatch();
+                } else {
+                    System.out.println("No roles provided for user: " + user.getUsername());
+                }
+
+                conn.commit();
+                return user;
             } catch (SQLException e) {
-                if(conn != null) {
-                    try {
-                        conn.rollback();
-                    } catch (SQLException rollbackEx) {
-                        throw new RuntimeException("Failed to rollback transaction", rollbackEx);
-                    }
-                }
-            }finally {
-                if(conn != null) {
-                    try{
-                        conn.close();
-                    } catch (SQLException closeEx) {
-                        throw new RuntimeException("Failed to close connection", closeEx);
-                    }
-                }
+                System.err.println("SQL Error: " + e.getMessage());
+                e.printStackTrace();
+                conn.rollback();
+                throw new RuntimeException("Error creating user: " + e.getMessage(), e);
+            } finally {
+                conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error establishing connection: " + e.getMessage(), e);
         }
-        return user;
     }
 
     @Override
@@ -321,65 +367,61 @@ public class UserDaoImpl implements UserDao {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Bật giao dịch
 
-            String sqlUsers = "UPDATE users SET username = ?, email = ?, password = ?, full_name = ?, phone = ?, " +
-                    "avatar_url = ?, date_of_birth = ?, gender = ?, account_status = ? WHERE user_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sqlUsers)) {
-                stmt.setString(1, user.getUsername());
-                stmt.setString(2, user.getEmail());
-                stmt.setString(3, user.getPassword());
-                stmt.setString(4, user.getFullName());
-                stmt.setString(5, user.getPhone());
-                stmt.setString(6, user.getAvatarUrl());
-                stmt.setDate(7, user.getDateOfBirth() != null ? Date.valueOf(user.getDateOfBirth()) : null);
-                stmt.setString(8, user.getGender() != null ? user.getGender().name() : null);
-                stmt.setString(9, user.getAccountStatus() != null ? user.getAccountStatus().name() : null);
-                stmt.setLong(10, user.getUserId());
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected == 0) {
-                    throw new IllegalArgumentException("User with ID " + user.getUserId() + " not found");
-                }
+            List<String> columns = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
+
+            if (user.getUsername() != null) {
+                columns.add("username = ?");
+                values.add(user.getUsername());
             }
-
-            // Lấy vai trò hiện tại
-            Set<String> currentRoles = new HashSet<>();
-            String selectRolesSql = "SELECT roles_name FROM user_roles WHERE user_id = ?";
-            try (PreparedStatement selectStmt = conn.prepareStatement(selectRolesSql)) {
-                selectStmt.setLong(1, user.getUserId());
-                ResultSet rs = selectStmt.executeQuery();
-                while (rs.next()) {
-                    currentRoles.add(rs.getString("roles_name"));
-                }
+            if (user.getEmail() != null) {
+                columns.add("email = ?");
+                values.add(user.getEmail());
             }
-
-            // Kết hợp vai trò hiện tại với vai trò mới
-            Set<String> updatedRoles = new HashSet<>(currentRoles);
-            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                updatedRoles.addAll(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet())); // Thêm vai trò mới
+            if (user.getPassword() != null) {
+                columns.add("password = ?");
+                values.add(user.getPassword());
             }
+            if (user.getFullName() != null) {
+                columns.add("full_name = ?");
+                values.add(user.getFullName());
+            }
+            if (user.getPhone() != null) {
+                columns.add("phone = ?");
+                values.add(user.getPhone());
+            }
+            if (user.getAvatarUrl() != null) {
+                columns.add("avatar_url = ?");
+                values.add(user.getAvatarUrl());
+            }
+            if (user.getDateOfBirth() != null) {
+                columns.add("date_of_birth = ?");
+                values.add(Date.valueOf(user.getDateOfBirth()));
+            }
+            columns.add("gender = ?");
+            values.add(user.getGender() != null ? user.getGender().name() : null);
+            columns.add("account_status = ?");
+            values.add(user.getAccountStatus() != null ? user.getAccountStatus().name() : null);
 
-            // Kiểm tra vai trò tồn tại trong bảng role
-            if (!updatedRoles.isEmpty()) {
-                String checkRolesSql = "SELECT name FROM role WHERE name IN (" +
-                        String.join(",", Collections.nCopies(updatedRoles.size(), "?")) + ")";
-                try (PreparedStatement checkStmt = conn.prepareStatement(checkRolesSql)) {
-                    int index = 1;
-                    for (String roleName : updatedRoles) {
-                        checkStmt.setString(index++, roleName);
+            // Nếu không có trường nào để cập nhật trong users, bỏ qua
+            if (!columns.isEmpty()) {
+                String sqlUsers = "UPDATE users SET " + String.join(", ", columns) + " WHERE user_id = ?";
+                values.add(user.getUserId());
+
+                try (PreparedStatement stmt = conn.prepareStatement(sqlUsers)) {
+                    for (int i = 0; i < values.size(); i++) {
+                        stmt.setObject(i + 1, values.get(i));
                     }
-                    ResultSet rs = checkStmt.executeQuery();
-                    Set<String> foundRoles = new HashSet<>();
-                    while (rs.next()) {
-                        foundRoles.add(rs.getString("name"));
-                    }
-                    if (foundRoles.size() != updatedRoles.size()) {
-                        throw new IllegalArgumentException("Some roles not found: " +
-                                updatedRoles.stream().filter(r -> !foundRoles.contains(r)).collect(Collectors.toSet()));
+                    int rowsAffected = stmt.executeUpdate();
+                    if (rowsAffected == 0) {
+                        throw new SQLException("User with ID " + user.getUserId() + " not found");
                     }
                 }
             }
 
+            // 2. Cập nhật bảng user_roles (ghi đè hoàn toàn)
             // Xóa vai trò cũ
             String deleteRolesSql = "DELETE FROM user_roles WHERE user_id = ?";
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteRolesSql)) {
@@ -388,12 +430,12 @@ public class UserDaoImpl implements UserDao {
             }
 
             // Chèn danh sách vai trò mới (nếu có)
-            if (!updatedRoles.isEmpty()) {
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
                 String sqlUserRoles = "INSERT INTO user_roles (user_id, roles_name) VALUES (?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(sqlUserRoles)) {
-                    for (String roleName : updatedRoles) {
+                    for (Role role : user.getRoles()) {
                         stmt.setLong(1, user.getUserId());
-                        stmt.setString(2, roleName);
+                        stmt.setString(2, role.getName());
                         stmt.addBatch();
                     }
                     stmt.executeBatch();
@@ -406,9 +448,13 @@ public class UserDaoImpl implements UserDao {
                 try {
                     conn.rollback();
                 } catch (SQLException rollbackEx) {
+                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
+                    rollbackEx.printStackTrace();
                     throw new RuntimeException("Rollback failed: " + rollbackEx.getMessage(), rollbackEx);
                 }
             }
+            System.err.println("SQL Error: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Error updating user: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
@@ -416,6 +462,8 @@ public class UserDaoImpl implements UserDao {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException closeEx) {
+                    System.err.println("Failed to close connection: " + closeEx.getMessage());
+                    closeEx.printStackTrace();
                     throw new RuntimeException("Failed to close connection: " + closeEx.getMessage(), closeEx);
                 }
             }

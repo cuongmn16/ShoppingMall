@@ -4,13 +4,11 @@ import com.example.shoppingMall.enums.AccountStatus;
 import com.example.shoppingMall.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 public class UserUpdateRequest {
     private String username;
     private String email;
-    private String password;
     private String fullName;
     private String phone;
     private String avatarUrl;
@@ -22,10 +20,9 @@ public class UserUpdateRequest {
     public UserUpdateRequest() {
     }
 
-    public UserUpdateRequest(String username, String email, String password, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<String> roles) {
+    public UserUpdateRequest(String username, String email, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<String> roles) {
         this.username = username;
         this.email = email;
-        this.password = password;
         this.fullName = fullName;
         this.phone = phone;
         this.avatarUrl = avatarUrl;
@@ -50,14 +47,6 @@ public class UserUpdateRequest {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFullName() {
