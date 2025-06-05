@@ -15,7 +15,8 @@ public enum ErrorCode {
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1009, "Email existed", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_FOUND(1010, "Permission not found", HttpStatus.BAD_REQUEST),
-    ERROR_SQL(1011, "SQL error", HttpStatus.INTERNAL_SERVER_ERROR)
+    ERROR_SQL(1011, "SQL error", HttpStatus.INTERNAL_SERVER_ERROR),
+    SHOPCATEGORY_NOT_FOUND(1012, "Shop category not found", HttpStatus.NOT_FOUND),
 
     ;
 

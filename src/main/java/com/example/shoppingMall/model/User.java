@@ -4,6 +4,7 @@ import com.example.shoppingMall.enums.Gender;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class User {
@@ -18,11 +19,14 @@ public class User {
     private AccountStatus accountStatus;
     private Gender gender;
     private Set<Role> roles = new HashSet<>();
+    private Set<Seller> sellers = new HashSet<>();
+    private List<Addresses> addresses;
+
 
     public User() {
     }
 
-    public User(long userId, String username, String email, String password, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<Role> roles) {
+    public User(long userId, String username, String email, String password, String fullName, String phone, String avatarUrl, LocalDate dateOfBirth, AccountStatus accountStatus, Gender gender, Set<Role> roles, Set<Seller> sellers, List<Addresses> addresses) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -34,6 +38,8 @@ public class User {
         this.accountStatus = accountStatus;
         this.gender = gender;
         this.roles = roles;
+        this.sellers = sellers;
+        this.addresses = addresses;
     }
 
     public long getUserId() {
@@ -122,5 +128,20 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Set<Seller> getSellers() {
+        return sellers;
+    }
+
+    public void setSellers(Set<Seller> sellers) {
+        this.sellers = sellers;
+    }
+
+    public List<Addresses> getAddresses() {
+        return addresses;
+    }
+    public void setAddresses(List<Addresses> addresses) {
+        this.addresses = addresses;
     }
 }

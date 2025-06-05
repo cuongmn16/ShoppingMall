@@ -14,6 +14,7 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Repository
 public class UserDaoImpl implements UserDao {
     @Autowired
@@ -278,13 +279,12 @@ public class UserDaoImpl implements UserDao {
         String insertUserRoleSql = "INSERT INTO user_roles (user_id, roles_name) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false); // Bật giao dịch
+            conn.setAutoCommit(false);
 
             try (PreparedStatement userStmt = conn.prepareStatement(insertUserSql, Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement checkRoleStmt = user.getRoles() != null && !user.getRoles().isEmpty() ? conn.prepareStatement(checkRoleSql) : null;
                  PreparedStatement userRoleStmt = user.getRoles() != null && !user.getRoles().isEmpty() ? conn.prepareStatement(insertUserRoleSql) : null) {
 
-                // Lưu User
                 userStmt.setString(1, user.getUsername());
                 userStmt.setString(2, user.getEmail());
                 userStmt.setString(3, user.getPassword());
@@ -405,7 +405,6 @@ public class UserDaoImpl implements UserDao {
             columns.add("account_status = ?");
             values.add(user.getAccountStatus() != null ? user.getAccountStatus().name() : null);
 
-            // Nếu không có trường nào để cập nhật trong users, bỏ qua
             if (!columns.isEmpty()) {
                 String sqlUsers = "UPDATE users SET " + String.join(", ", columns) + " WHERE user_id = ?";
                 values.add(user.getUserId());
@@ -421,15 +420,12 @@ public class UserDaoImpl implements UserDao {
                 }
             }
 
-            // 2. Cập nhật bảng user_roles (ghi đè hoàn toàn)
-            // Xóa vai trò cũ
             String deleteRolesSql = "DELETE FROM user_roles WHERE user_id = ?";
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteRolesSql)) {
                 deleteStmt.setLong(1, user.getUserId());
                 deleteStmt.executeUpdate();
             }
 
-            // Chèn danh sách vai trò mới (nếu có)
             if (user.getRoles() != null && !user.getRoles().isEmpty()) {
                 String sqlUserRoles = "INSERT INTO user_roles (user_id, roles_name) VALUES (?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(sqlUserRoles)) {
