@@ -1,10 +1,8 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.response;
 
 import com.example.shoppingMall.enums.ProductStatus;
 
-import java.util.List;
-
-public class Product {
+public class ProductResponse {
     private long productId;
     private long sellerId;
     private long categoryId;
@@ -18,14 +16,11 @@ public class Product {
     private double rating;
     private ProductStatus productStatus;
     private String productImage;
-    private List<ProductImages> productImages;
-    private List<ProductAttributes> productAttributes;
-    private List<ProductVariations> productVariations;
 
-    public Product() {
+    public ProductResponse() {
     }
 
-    public Product(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, Double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage,List<ProductImages> productImages, List<ProductAttributes> productAttributes, List<ProductVariations> productVariations) {
+    public ProductResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, Double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -39,9 +34,6 @@ public class Product {
         this.rating = rating;
         this.productStatus = productStatus;
         this.productImage = productImage;
-        this.productImages = productImages;
-        this.productAttributes = productAttributes;
-        this.productVariations = productVariations;
     }
 
     public long getProductId() {
@@ -143,30 +135,8 @@ public class Product {
     public String getProductImage() {
         return productImage;
     }
+
     public void setProductImage(String productImage) {
         this.productImage = productImage;
-    }
-    public List<ProductImages> getProductImages() {
-        return productImages;
-    }
-
-    public void setProductImages(List<ProductImages> productImages) {
-        this.productImages = productImages;
-    }
-
-    public List<ProductAttributes> getProductAttributes() {
-        return productAttributes;
-    }
-
-    public void setProductAttributes(List<ProductAttributes> productAttributes) {
-        this.productAttributes = productAttributes;
-    }
-
-    public List<ProductVariations> getProductVariations() {
-        return productVariations;
-    }
-
-    public void setProductVariations(List<ProductVariations> productVariations) {
-        this.productVariations = productVariations;
     }
 }

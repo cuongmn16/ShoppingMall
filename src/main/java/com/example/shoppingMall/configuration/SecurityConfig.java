@@ -23,7 +23,8 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-             "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh"
+//             "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh"
+            "/api/**"
     };
 
     @Value("${jwt.signerKey}")
@@ -33,6 +34,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 

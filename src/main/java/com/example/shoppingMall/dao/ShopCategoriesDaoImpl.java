@@ -69,6 +69,10 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
         PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1, shopCategory.getCategoryName());
             stmt.setString(2, shopCategory.getIconUrl());
+
+            if(shopCategory.getActive() == null) {
+                shopCategory.setActive(true);
+            }
             stmt.setBoolean(3, shopCategory.getActive());
             stmt.executeUpdate();
             return shopCategory;

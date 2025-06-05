@@ -22,7 +22,9 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public List<Product> getAllProducts(int pageNumber, int pageSize) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM products LIMIT ? OFFSET ?";
+        String sql = "SELECT p.* , pi.image_url FROM products p "+
+                "LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1 " +
+                "LIMIT ? OFFSET ?";
         try(Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -50,7 +52,9 @@ public class ProductDaoImpl implements ProductDao {
                 } else {
                     product.setProductStatus(ProductStatus.ACTIVE);
                 }
+                product.setProductImage(rs.getString("image_url"));
                 products.add(product);
+
 
             }
             return products;
@@ -72,7 +76,32 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product addProduct(Product product) {
-        return null;
+        String sql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, product_status, product_image) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setLong(1, product.getSellerId());
+            stmt.setLong(2, product.getCategoryId());
+            stmt.setString(3, product.getProductName());
+            stmt.setDouble(4, product.getPrice());
+            stmt.setDouble(5, product.getOriginalPrice());
+            stmt.setDouble(6, product.getDiscount());
+            stmt.setLong(7, product.getStockQuantity());
+            stmt.setString(8, product.getProductStatus().name());
+            stmt.setString(9, product.getProductImage());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    product.setProductId(generatedKeys.getLong(1));
+                }
+
+            }
+            return product;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

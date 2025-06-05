@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public class PermissionImpl implements PermissionDao {
+public class PermissionDaoImpl implements PermissionDao {
     @Autowired
     private DataSource dataSource;
     @Override

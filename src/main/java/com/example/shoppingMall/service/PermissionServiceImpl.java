@@ -31,7 +31,8 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     public void deletePermission(String  permission){
-        if (!permissionDao.isPermissionExists(permission)) {
+        var exist = permissionDao.isPermissionExists(permission);
+        if (!exist) {
             throw new AppException(ErrorCode.PERMISSION_NOT_FOUND);
         }
         permissionDao.deletePermission(permission);
