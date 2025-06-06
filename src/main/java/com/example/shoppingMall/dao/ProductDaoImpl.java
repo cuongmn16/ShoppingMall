@@ -76,8 +76,8 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product addProduct(Product product) {
-        String sql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, product_status, product_image) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, product.getSellerId());
@@ -88,7 +88,6 @@ public class ProductDaoImpl implements ProductDao {
             stmt.setDouble(6, product.getDiscount());
             stmt.setLong(7, product.getStockQuantity());
             stmt.setString(8, product.getProductStatus().name());
-            stmt.setString(9, product.getProductImage());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
@@ -106,11 +105,19 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product updateProduct(long productId, Product product) {
+
         return null;
     }
 
     @Override
     public void deleteProduct(long productId) {
-
+        String sql = "DELETE FROM products WHERE product_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, productId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

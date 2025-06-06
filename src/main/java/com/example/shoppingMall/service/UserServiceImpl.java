@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAllUsers() {
         return userDao.getAllUsers().stream().map(userMapper::toUserResponse).toList();
     }

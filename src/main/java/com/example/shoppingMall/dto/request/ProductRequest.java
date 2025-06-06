@@ -8,6 +8,7 @@ public class ProductRequest {
     private String productName;
     private double price;
     private double originalPrice;
+    private double discount;
     private long stockQuantity;
     private long soldQuantity;
     private ProductStatus productStatus;
@@ -16,11 +17,12 @@ public class ProductRequest {
     public ProductRequest() {
     }
 
-    public ProductRequest(long sellerId, long categoryId, String productName, double price, double originalPrice, long stockQuantity, long soldQuantity, ProductStatus productStatus, String productImage) {
+    public ProductRequest(long sellerId, long categoryId, String productName, double price,double discount, double originalPrice, long stockQuantity, long soldQuantity, ProductStatus productStatus, String productImage) {
         this.sellerId = sellerId;
         this.categoryId = categoryId;
         this.productName = productName;
         this.price = price;
+        this.discount = discount;
         this.originalPrice = originalPrice;
         this.stockQuantity = stockQuantity;
         this.soldQuantity = soldQuantity;
@@ -62,6 +64,14 @@ public class ProductRequest {
 
     public double getOriginalPrice() {
         return originalPrice;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 
     public void setOriginalPrice(double originalPrice) {

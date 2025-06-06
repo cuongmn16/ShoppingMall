@@ -12,7 +12,7 @@ public class Product {
     private String description;
     private double price;
     private double originalPrice;
-    private Double discount;
+    private double discount;
     private long stockQuantity;
     private long soldQuantity;
     private double rating;
@@ -25,7 +25,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, Double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage,List<ProductImages> productImages, List<ProductAttributes> productAttributes, List<ProductVariations> productVariations) {
+    public Product(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage,List<ProductImages> productImages, List<ProductAttributes> productAttributes, List<ProductVariations> productVariations) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -100,11 +100,11 @@ public class Product {
         this.originalPrice = originalPrice;
     }
 
-    public Double getDiscount() {
+    public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Double discount) {
+    public void setDiscount(double discount) {
         this.discount = discount;
     }
 
