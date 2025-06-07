@@ -10,4 +10,12 @@ public interface SellerService {
     List<SellerResponse> getAllSellers();
 
     SellerResponse createSeller(SellerRequest sellerRequest);
+
+    SellerResponse getSellerById(long sellerId);
+
+    SellerResponse updateSeller(long sellerId, Seller seller);
+
+    boolean isSellerExists(long sellerId);
+
+    void deleteSeller(long sellerId);
 }

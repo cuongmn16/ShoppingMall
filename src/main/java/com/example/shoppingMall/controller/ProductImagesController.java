@@ -1,5 +1,6 @@
 package com.example.shoppingMall.controller;
 
+import com.example.shoppingMall.dto.request.ProductImagesRequest;
 import com.example.shoppingMall.dto.response.ApiResponse;
 import com.example.shoppingMall.dto.response.ProductImagesResponse;
 import com.example.shoppingMall.dto.response.ProductResponse;
@@ -22,8 +23,37 @@ public class ProductImagesController {
     @GetMapping("/{productId}")
     public ApiResponse<List<ProductImagesResponse>> getAllProductImages(@PathVariable long productId) {
         ApiResponse<List<ProductImagesResponse>> apiResponse = new ApiResponse<>();
-        List<ProductImagesResponse> productImagesList = productImagesService.getAllProductImages(productId);
-        apiResponse.setResult(productImagesList);
+        apiResponse.setResult(productImagesService.getAllProductImages(productId));
         return apiResponse;
     }
+
+    @GetMapping("/image/{imageId}")
+    public ApiResponse<ProductImagesResponse> getProductImageById(@PathVariable long productId, long imageId) {
+        ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productImagesService.getProductImageById(productId, imageId));
+        return apiResponse;
+    }
+
+    @GetMapping("/product/{productId}")
+    public ApiResponse<ProductImagesResponse> deleteProductImageById(@PathVariable long productId, long imageId) {
+        ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
+        productImagesService.deleteProductImage(productId, imageId);
+        apiResponse.setMessage("Product image deleted successfully");
+        return apiResponse;
+    }
+
+    @GetMapping("/add/{productId}")
+    public ApiResponse<ProductImagesResponse> addProductImage(@PathVariable long productId, ProductImagesRequest productImagesRequest) {
+        ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productImagesService.addProductImage(productId, productImagesRequest));
+        return apiResponse;
+    }
+
+    @GetMapping("/update/{productId}")
+    public ApiResponse<ProductImagesResponse> updateProductImage(@PathVariable long productId, long imageId, ProductImagesRequest productImagesRequest) {
+        ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productImagesService.updateProductImage(productId, imageId, productImagesRequest));
+        return apiResponse;
+    }
+    
 }

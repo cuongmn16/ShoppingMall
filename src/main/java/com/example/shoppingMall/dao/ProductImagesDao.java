@@ -8,11 +8,13 @@ public interface ProductImagesDao {
 
     List<ProductImages> getAllProductImages(long productId);
 
-    ProductImages addProductImage(long productId,ProductImages productImages);
+    void addProductImage(long productId,ProductImages productImages);
 
     ProductImages updateProductImage(long productId, long imageId, ProductImages productImages);
 
     void deleteProductImage(long productId, long imageId);
 
+    ProductImages getProductImageById(long productId, long imageId);
 
+    boolean isProductImageExistsById(long productId, long imageId);
 }

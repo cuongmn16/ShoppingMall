@@ -44,6 +44,25 @@ public class SellerDaoImpl implements SellerDao {
 
     @Override
     public Seller getSellerById(long sellerId) {
+        String sql = "SELECT * FROM sellers WHERE seller_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, sellerId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Seller seller = new Seller();
+                seller.setSellerId(rs.getLong("seller_id"));
+                seller.setUserId(rs.getLong("user_id"));
+                seller.setShopName(rs.getString("shop_name"));
+                seller.setShopDescription(rs.getString("shop_description"));
+                seller.setShopLogo(rs.getString("shop_logo"));
+                seller.setRating(rs.getDouble("rating"));
+                seller.setTotal_Products(rs.getLong("total_products"));
+                return seller;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
@@ -75,16 +94,50 @@ public class SellerDaoImpl implements SellerDao {
 
     @Override
     public Seller updateSeller(long sellerId, Seller seller) {
+        String sql = "UPDATE sellers SET user_id = ?, shop_name = ?, shop_description = ?, shop_logo = ? WHERE seller_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, seller.getUserId());
+            stmt.setString(2, seller.getShopName());
+            stmt.setString(3, seller.getShopDescription());
+            stmt.setString(4, seller.getShopLogo());
+            stmt.setLong(5, sellerId);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                seller.setSellerId(sellerId);
+                return seller;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
     @Override
     public boolean isSellerExists(long sellerId) {
+        String sql = "SELECT COUNT(*) FROM sellers WHERE seller_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, sellerId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return false;
     }
 
     @Override
     public void deleteSeller(long sellerId) {
-
+        String sql = "DELETE FROM sellers WHERE seller_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, sellerId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
