@@ -1,31 +1,21 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.request;
 
-public class ProductVariations {
-    private long variationId;
+public class ProductVariationsRequest {
     private long productId;
     private String variationName;
     private Double priceAdjustment;
     private long stockQuantity;
     private String imageUrl;
 
-    public ProductVariations() {
+    public ProductVariationsRequest() {
     }
 
-    public ProductVariations(long variationId, long productId, String variationName, Double priceAdjustment, long stockQuantity, String imageUrl) {
-        this.variationId = variationId;
+    public ProductVariationsRequest(long productId, String variationName, Double priceAdjustment, long stockQuantity, String imageUrl) {
         this.productId = productId;
         this.variationName = variationName;
         this.priceAdjustment = priceAdjustment;
         this.stockQuantity = stockQuantity;
         this.imageUrl = imageUrl;
-    }
-
-    public long getVariationId() {
-        return variationId;
-    }
-
-    public void setVariationId(long variationId) {
-        this.variationId = variationId;
     }
 
     public long getProductId() {
@@ -35,7 +25,6 @@ public class ProductVariations {
     public void setProductId(long productId) {
         this.productId = productId;
     }
-
 
     public String getVariationName() {
         return variationName;

@@ -31,15 +31,17 @@ public class ProductVariationsDaoImpl implements ProductVariationsDao {
                 variation.setVariationId(rs.getLong("variation_id"));
                 variation.setProductId(rs.getLong("product_id"));
                 variation.setVariationName(rs.getString("variation_name"));
+                variation.setPriceAdjustment(rs.getDouble("price_adjustment"));
+                variation.setStockQuantity(rs.getInt("stock_quantity"));
+                variation.setImageUrl(rs.getString("image_url"));
 
-
-
+                variations.add(variation);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return List.of();
+        return variations;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.shoppingMall.controller;
 
 import com.example.shoppingMall.dto.request.ProductRequest;
 import com.example.shoppingMall.dto.response.ApiResponse;
+import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.dto.response.ProductResponse;
 import com.example.shoppingMall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,15 @@ public class ProductController {
         apiResponse.setResult(products);
         return apiResponse;
     }
+
+    @GetMapping("/{productId}")
+    public ApiResponse<ProductDetailResponse> getProductDetail(@PathVariable long productId) {
+      ProductDetailResponse productDetailResponse = productService.getProductDetail(productId);
+        ApiResponse<ProductDetailResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productDetailResponse);
+        return apiResponse;
+    }
+
 
     @PostMapping
     public ApiResponse<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {

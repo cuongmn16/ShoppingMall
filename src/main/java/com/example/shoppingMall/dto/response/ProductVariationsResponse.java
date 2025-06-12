@@ -1,6 +1,6 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.response;
 
-public class ProductVariations {
+public class ProductVariationsResponse {
     private long variationId;
     private long productId;
     private String variationName;
@@ -8,10 +8,10 @@ public class ProductVariations {
     private long stockQuantity;
     private String imageUrl;
 
-    public ProductVariations() {
+    public ProductVariationsResponse() {
     }
 
-    public ProductVariations(long variationId, long productId, String variationName, Double priceAdjustment, long stockQuantity, String imageUrl) {
+    public ProductVariationsResponse(long variationId, long productId, String variationName, Double priceAdjustment, long stockQuantity, String imageUrl) {
         this.variationId = variationId;
         this.productId = productId;
         this.variationName = variationName;
@@ -35,7 +35,6 @@ public class ProductVariations {
     public void setProductId(long productId) {
         this.productId = productId;
     }
-
 
     public String getVariationName() {
         return variationName;

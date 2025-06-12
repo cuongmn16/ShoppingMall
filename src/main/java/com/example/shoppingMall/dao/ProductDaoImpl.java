@@ -71,7 +71,38 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product getProductById(long productId) {
-        return null;
+        Product product = null;
+        String sql = "SELECT * FROM products" +
+                " WHERE product_id = ?";
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, productId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                product = new Product();
+                product.setProductId(rs.getLong("product_id"));
+                product.setSellerId(rs.getLong("seller_id"));
+                product.setCategoryId(rs.getLong("category_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getDouble("price"));
+                product.setOriginalPrice(rs.getDouble("original_price"));
+                product.setDiscount(rs.getDouble("discount"));
+                product.setStockQuantity(rs.getInt("stock_quantity"));
+                product.setSoldQuantity(rs.getInt("sold_quantity"));
+                product.setRating(rs.getDouble("rating"));
+
+                String productStatus = rs.getString("status");
+                if(productStatus != null) {
+                    product.setProductStatus(ProductStatus.valueOf(productStatus));
+                } else {
+                    product.setProductStatus(ProductStatus.ACTIVE);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return product;
     }
 
     @Override

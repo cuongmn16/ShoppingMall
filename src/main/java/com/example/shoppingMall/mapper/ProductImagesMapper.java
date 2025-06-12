@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ProductImagesMapper {
+
     ProductImages toProductImages(ProductImagesRequest productImagesRequest);
 
     ProductImagesResponse toProductImagesResponse(ProductImages productImages);

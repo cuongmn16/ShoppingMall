@@ -17,6 +17,7 @@ public enum ErrorCode {
     PERMISSION_NOT_FOUND(1010, "Permission not found", HttpStatus.BAD_REQUEST),
     ERROR_SQL(1011, "SQL error", HttpStatus.INTERNAL_SERVER_ERROR),
     SHOPCATEGORY_NOT_FOUND(1012, "Shop category not found", HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_FOUND(1013, "Product not found", HttpStatus.NOT_FOUND),
     PRODUCT_IMAGE_NOT_FOUND(1013, "Product image not found", HttpStatus.NOT_FOUND),
     SELLER_NOT_FOUND(1014, "Seller not found", HttpStatus.NOT_FOUND),
 
