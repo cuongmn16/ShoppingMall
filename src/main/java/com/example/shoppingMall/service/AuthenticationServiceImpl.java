@@ -13,6 +13,9 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -111,5 +114,35 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
         return stringJoiner.toString();
     }
+
+    public Claims getClaimsFromToken(String token) {
+        return  Jwts.parserBuilder()
+                .setSigningKey(SIGNER_KEY.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public String extractUsernameFromRequest(HttpServletRequest request) {
+        String jwt = request.getHeader("Authorization");
+        if (jwt == null || !jwt.startsWith("Bearer ")) {
+            throw new AppException(ErrorCode.INVALID_OR_MISSING_TOKEN);
+        }
+
+        jwt = jwt.substring(7);
+        Claims claims = getClaimsFromToken(jwt);
+
+        if (claims.getExpiration().before(new Date())) {
+            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        }
+
+        String username = claims.getSubject();
+        if (username == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+
+        return username;
+    }
+
 
 }
