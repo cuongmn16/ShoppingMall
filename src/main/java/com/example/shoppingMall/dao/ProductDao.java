@@ -7,7 +7,7 @@ import java.util.List;
 public interface ProductDao {
     List<Product> getAllProducts(int pageNumber, int pageSize);
 
-    List<Product> getAllProductsByCategory(long categoryId);
+    List<Product> getAllProductsByCategory(long categoryId,int pageNumber, int pageSize);
 
     Product getProductById(long productId);
 

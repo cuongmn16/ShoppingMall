@@ -31,7 +31,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts(int pageNumber, int pageSize) {
-        return productDao.getAllProducts(pageNumber, pageSize).stream().map(productMapper::toProduct).toList();
+        return productDao.getAllProducts(pageNumber, pageSize)
+                .stream().map(productMapper::toProduct).toList();
+    }
+
+    @Override
+    public List<ProductResponse> getAllProductsByCategoryId(long categoryId, int pageNumber, int pageSize) {
+        return productDao.getAllProductsByCategory(categoryId, pageNumber, pageSize)
+                .stream().map(productMapper::toProduct).toList();
+
     }
 
     @Override

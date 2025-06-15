@@ -3,6 +3,7 @@ package com.example.shoppingMall.model;
 import com.example.shoppingMall.enums.OrderStatus;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Orders {
     private long orderId;
@@ -13,11 +14,12 @@ public class Orders {
     private double shippingFee;
     private double discountAmount;
     private LocalDate dateTime;
+    private List<OrderItems> orderItems;
 
     public Orders() {
     }
 
-    public Orders(long orderId, long userId, long shippingAddressId, OrderStatus orderStatus, double totalAmount, double shippingFee, double discountAmount, LocalDate dateTime) {
+    public Orders(long orderId, long userId, long shippingAddressId, OrderStatus orderStatus, double totalAmount, double shippingFee, double discountAmount, LocalDate dateTime, List<OrderItems> orderItems) {
         this.orderId = orderId;
         this.userId = userId;
         this.shippingAddressId = shippingAddressId;
@@ -26,6 +28,7 @@ public class Orders {
         this.shippingFee = shippingFee;
         this.discountAmount = discountAmount;
         this.dateTime = dateTime;
+        this.orderItems = orderItems;
     }
 
     public long getOrderId() {
@@ -90,5 +93,13 @@ public class Orders {
 
     public void setDateTime(LocalDate dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public List<OrderItems> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItems> orderItems) {
+        this.orderItems = orderItems;
     }
 }

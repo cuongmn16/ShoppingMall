@@ -18,8 +18,18 @@ public class ProductController {
 
     @GetMapping
     public ApiResponse<List<ProductResponse>> getAllProducts(@RequestParam(defaultValue = "1") int pageNumber,
-                                                             @RequestParam(defaultValue = "20") int pageSize) {
+                                                             @RequestParam(defaultValue = "10") int pageSize) {
         List<ProductResponse> products = productService.getAllProducts(pageNumber, pageSize);
+        ApiResponse<List<ProductResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(products);
+        return apiResponse;
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ApiResponse<List<ProductResponse>> getAllProductsByCategoryId(@PathVariable long categoryId,
+                                                                         @RequestParam(defaultValue = "1") int pageNumber,
+                                                                         @RequestParam(defaultValue = "10") int pageSize) {
+        List<ProductResponse> products = productService.getAllProductsByCategoryId(categoryId, pageNumber, pageSize);
         ApiResponse<List<ProductResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(products);
         return apiResponse;

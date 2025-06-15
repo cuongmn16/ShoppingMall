@@ -6,7 +6,9 @@ import com.example.shoppingMall.dto.response.CartResponse;
 import java.util.List;
 
 public interface CartService {
-    List<CartResponse> getAllCarts(long userId);
+    List<CartResponse> getAllCarts(String username);
 
     CartResponse addToCart(String username,CartRequest cartRequest);
+
+    void deleteCart(long cartId);
 }

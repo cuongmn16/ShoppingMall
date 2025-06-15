@@ -46,7 +46,7 @@ public class ProductDaoImpl implements ProductDao {
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setRating(rs.getDouble("rating"));
 
-                String productStatus = rs.getString("product_status");
+                String productStatus = rs.getString("status");
                 if(productStatus != null) {
                     product.setProductStatus(ProductStatus.valueOf(productStatus));
                 } else {
@@ -65,8 +65,48 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public List<Product> getAllProductsByCategory(long categoryId) {
-        return List.of();
+    public List<Product> getAllProductsByCategory(long categoryId, int pageNumber, int pageSize) {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT p.* , pi.image_url FROM products p " +
+                "LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1 " +
+                "WHERE p.category_id = ? " +
+                "LIMIT ? OFFSET ?";
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int offset = (pageNumber - 1) * pageSize;
+            stmt.setLong(1, categoryId);
+            stmt.setInt(2, pageSize);
+            stmt.setInt(3, offset);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Product product = new Product();
+                product.setProductId(rs.getLong("product_id"));
+                product.setSellerId(rs.getLong("seller_id"));
+                product.setCategoryId(rs.getLong("category_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getDouble("price"));
+                product.setDiscount(rs.getDouble("discount"));
+                product.setStockQuantity(rs.getInt("stock_quantity"));
+                product.setSoldQuantity(rs.getInt("sold_quantity"));
+                product.setRating(rs.getDouble("rating"));
+
+                String productStatus = rs.getString("status");
+                if(productStatus != null) {
+                    product.setProductStatus(ProductStatus.valueOf(productStatus));
+                } else {
+                    product.setProductStatus(ProductStatus.ACTIVE);
+                }
+                product.setProductImage(rs.getString("image_url"));
+                products.add(product);
+            }
+            return products;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

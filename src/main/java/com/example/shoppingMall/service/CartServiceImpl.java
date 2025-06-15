@@ -23,8 +23,12 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
-    public List<CartResponse> getAllCarts(long userId) {
-        return List.of();
+    public List<CartResponse> getAllCarts(String username) {
+    if(!userDao.isUserExistsByUsername(username)){
+        throw new AppException(ErrorCode.USER_NOT_EXISTED);
+    }
+        return cartDao.getAllCarts(username);
+
     }
 
     @Override
@@ -35,5 +39,10 @@ public class CartServiceImpl implements CartService {
         var cart = cartMapper.toCartRequest(cartRequest);
         var savedCart = cartDao.addToCart(username,cart);
         return cartMapper.toCartResponse(savedCart);
+    }
+
+    @Override
+    public void deleteCart(long cartId) {
+        cartDao.deleteCart(cartId);
     }
 }
