@@ -22,9 +22,23 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public List<Product> getAllProducts(int pageNumber, int pageSize) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.* , pi.image_url FROM products p "+
-                "LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1 " +
-                "LIMIT ? OFFSET ?";
+        String sql = """
+            SELECT 
+                p.product_id, p.seller_id, p.category_id, p.product_name, 
+                p.description, p.price, p.original_price, p.discount,
+                p.stock_quantity, p.sold_quantity, p.rating, p.status,
+                COALESCE(SUM(p.sold_quantity), 0) AS total_sold,
+                pi.image_url
+            FROM products p
+            LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1
+            GROUP BY 
+                p.product_id, p.seller_id, p.category_id, p.product_name, 
+                p.description, p.price, p.original_price, p.discount,
+                p.stock_quantity, p.sold_quantity, p.rating, p.status,
+                pi.image_url
+            ORDER BY total_sold DESC
+            LIMIT ? OFFSET ?
+            """;
         try(Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -41,6 +55,7 @@ public class ProductDaoImpl implements ProductDao {
                 product.setProductName(rs.getString("product_name"));
                 product.setDescription(rs.getString("description"));
                 product.setPrice(rs.getDouble("price"));
+                product.setOriginalPrice(rs.getDouble("original_price"));
                 product.setDiscount(rs.getDouble("discount"));
                 product.setStockQuantity(rs.getInt("stock_quantity"));
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
@@ -67,10 +82,24 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public List<Product> getAllProductsByCategory(long categoryId, int pageNumber, int pageSize) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.* , pi.image_url FROM products p " +
-                "LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1 " +
-                "WHERE p.category_id = ? " +
-                "LIMIT ? OFFSET ?";
+        String sql = """
+            SELECT 
+                p.product_id, p.seller_id, p.category_id, p.product_name, 
+                p.description, p.price, p.original_price, p.discount,
+                p.stock_quantity, p.sold_quantity, p.rating, p.status,
+                COALESCE(SUM(p.sold_quantity), 0) AS total_sold,
+                pi.image_url
+            FROM products p
+            LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1
+            WHERE p.category_id = ?
+            GROUP BY 
+                p.product_id, p.seller_id, p.category_id, p.product_name, 
+                p.description, p.price, p.original_price, p.discount,
+                p.stock_quantity, p.sold_quantity, p.rating, p.status,
+                pi.image_url
+            ORDER BY total_sold DESC
+            LIMIT ? OFFSET ?
+            """;
         try(Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
