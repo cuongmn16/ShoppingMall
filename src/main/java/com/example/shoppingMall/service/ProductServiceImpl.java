@@ -2,16 +2,12 @@ package com.example.shoppingMall.service;
 
 
 import com.example.shoppingMall.dao.ProductDao;
-import com.example.shoppingMall.dao.ProductImagesDao;
 import com.example.shoppingMall.dto.request.ProductRequest;
 import com.example.shoppingMall.dto.response.*;
 import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
-import com.example.shoppingMall.mapper.ProductImagesMapper;
 import com.example.shoppingMall.mapper.ProductMapper;
 import com.example.shoppingMall.model.Product;
-import com.example.shoppingMall.model.ProductImages;
-import com.example.shoppingMall.model.ProductVariations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDetailResponse getProductDetail(long productId) {
-        Product product = productDao.getProductById(productId);
+        ProductDetailResponse product = productDao.getProductById(productId);
         if (product == null){
             throw  new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }
@@ -61,6 +57,9 @@ public class ProductServiceImpl implements ProductService {
         productDetailResponse.setSoldQuantity(product.getSoldQuantity());
         productDetailResponse.setRating(product.getRating());
         productDetailResponse.setProductStatus(product.getProductStatus());
+        productDetailResponse.setShopName(product.getShopName());
+        productDetailResponse.setShopDescription(product.getShopDescription());
+        productDetailResponse.setShopLogo(product.getShopLogo());
 
         List<ProductImagesResponse> productImages = productImagesService.getAllProductImages(productId);
         productDetailResponse.setProductImages(productImages);

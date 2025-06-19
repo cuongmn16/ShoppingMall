@@ -1,10 +1,7 @@
 package com.example.shoppingMall.controller;
 
-import com.example.shoppingMall.dto.request.CartRequest;
 import com.example.shoppingMall.dto.response.ApiResponse;
-import com.example.shoppingMall.dto.response.CartResponse;
 import com.example.shoppingMall.service.AuthenticationService;
-import com.example.shoppingMall.service.CartService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,5 +1,6 @@
 package com.example.shoppingMall.dao;
 
+import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.model.Product;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public interface ProductDao {
 
     List<Product> getAllProductsByCategory(long categoryId,int pageNumber, int pageSize);
 
-    Product getProductById(long productId);
+    ProductDetailResponse getProductById(long productId);
 
     Product addProduct(Product product);
 

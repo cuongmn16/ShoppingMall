@@ -1,5 +1,6 @@
 package com.example.shoppingMall.dao;
 
+import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.enums.ProductStatus;
 import com.example.shoppingMall.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,16 +140,17 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public Product getProductById(long productId) {
-        Product product = null;
-        String sql = "SELECT * FROM products" +
+    public ProductDetailResponse getProductById(long productId) {
+        ProductDetailResponse product = null;
+        String sql = "SELECT p.*, s.*  FROM products p " +
+                "INNER JOIN sellers s ON p.seller_id = s.seller_id" +
                 " WHERE product_id = ?";
         try(Connection conn = dataSource.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, productId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                product = new Product();
+                product = new ProductDetailResponse();
                 product.setProductId(rs.getLong("product_id"));
                 product.setSellerId(rs.getLong("seller_id"));
                 product.setCategoryId(rs.getLong("category_id"));
@@ -160,6 +162,9 @@ public class ProductDaoImpl implements ProductDao {
                 product.setStockQuantity(rs.getInt("stock_quantity"));
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setRating(rs.getDouble("rating"));
+                product.setShopName(rs.getString("shop_name"));
+                product.setShopDescription(rs.getString("shop_description"));
+                product.setShopLogo(rs.getString("shop_logo"));
 
                 String productStatus = rs.getString("status");
                 if(productStatus != null) {

@@ -19,6 +19,9 @@ public class ProductDetailResponse {
     private double rating;
     private ProductStatus productStatus;
     private String productImage;
+    private String shopName;
+    private String shopDescription;
+    private String shopLogo;
     private List<ProductImagesResponse> productImages;
     private List<ProductAttributesResponse> productAttributes;
     private List<ProductVariationsResponse> productVariations;
@@ -26,7 +29,7 @@ public class ProductDetailResponse {
     public ProductDetailResponse() {
     }
 
-    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, List<ProductImagesResponse> productImages, List<ProductAttributesResponse> productAttributes, List<ProductVariationsResponse> productVariations) {
+    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, String shopName, String shopDescription, String shopLogo, List<ProductImagesResponse> productImages, List<ProductAttributesResponse> productAttributes, List<ProductVariationsResponse> productVariations) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -40,6 +43,9 @@ public class ProductDetailResponse {
         this.rating = rating;
         this.productStatus = productStatus;
         this.productImage = productImage;
+        this.shopName = shopName;
+        this.shopDescription = shopDescription;
+        this.shopLogo = shopLogo;
         this.productImages = productImages;
         this.productAttributes = productAttributes;
         this.productVariations = productVariations;
@@ -147,6 +153,30 @@ public class ProductDetailResponse {
 
     public void setProductImage(String productImage) {
         this.productImage = productImage;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getShopDescription() {
+        return shopDescription;
+    }
+
+    public void setShopDescription(String shopDescription) {
+        this.shopDescription = shopDescription;
+    }
+
+    public String getShopLogo() {
+        return shopLogo;
+    }
+
+    public void setShopLogo(String shopLogo) {
+        this.shopLogo = shopLogo;
     }
 
     public List<ProductImagesResponse> getProductImages() {
