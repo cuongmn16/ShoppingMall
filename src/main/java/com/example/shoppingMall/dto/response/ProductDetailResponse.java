@@ -23,13 +23,11 @@ public class ProductDetailResponse {
     private String shopDescription;
     private String shopLogo;
     private List<ProductImagesResponse> productImages;
-    private List<ProductAttributesResponse> productAttributes;
-    private List<ProductVariationsResponse> productVariations;
 
     public ProductDetailResponse() {
     }
 
-    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, String shopName, String shopDescription, String shopLogo, List<ProductImagesResponse> productImages, List<ProductAttributesResponse> productAttributes, List<ProductVariationsResponse> productVariations) {
+    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, String shopName, String shopDescription, String shopLogo, List<ProductImagesResponse> productImages) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -47,8 +45,7 @@ public class ProductDetailResponse {
         this.shopDescription = shopDescription;
         this.shopLogo = shopLogo;
         this.productImages = productImages;
-        this.productAttributes = productAttributes;
-        this.productVariations = productVariations;
+
     }
 
     public long getProductId() {
@@ -187,19 +184,5 @@ public class ProductDetailResponse {
         this.productImages = productImages;
     }
 
-    public List<ProductAttributesResponse> getProductAttributes() {
-        return productAttributes;
-    }
 
-    public void setProductAttributes(List<ProductAttributesResponse> productAttributes) {
-        this.productAttributes = productAttributes;
-    }
-
-    public List<ProductVariationsResponse> getProductVariations() {
-        return productVariations;
-    }
-
-    public void setProductVariations(List<ProductVariationsResponse> productVariations) {
-        this.productVariations = productVariations;
-    }
 }

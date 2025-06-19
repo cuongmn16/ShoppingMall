@@ -20,10 +20,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
     @Autowired
     private ProductImagesService productImagesService;
-    @Autowired
-    private ProductAttributesService productAttributesService;
-    @Autowired
-    private ProductVariationsService productVariationsService;
+
 
     @Override
     public List<ProductResponse> getAllProducts(int pageNumber, int pageSize) {
@@ -64,11 +61,6 @@ public class ProductServiceImpl implements ProductService {
         List<ProductImagesResponse> productImages = productImagesService.getAllProductImages(productId);
         productDetailResponse.setProductImages(productImages);
 
-        List<ProductAttributesResponse> productAttributesResponses = productAttributesService.getAllProductAttributes(productId);
-        productDetailResponse.setProductAttributes(productAttributesResponses);
-
-        List<ProductVariationsResponse> productVariationsResponses = productVariationsService.getAllProductVariations(productId);
-        productDetailResponse.setProductVariations(productVariationsResponses);
 
         return productDetailResponse;
 
