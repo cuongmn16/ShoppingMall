@@ -46,7 +46,7 @@ public class ProductController {
 
     @PostMapping
     public ApiResponse<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
-        ProductResponse productResponse = productService.createProduct(productRequest);
+        ProductResponse productResponse = productService.addProduct(productRequest);
         ApiResponse<ProductResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(productResponse);
         return apiResponse;

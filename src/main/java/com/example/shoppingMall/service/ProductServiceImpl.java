@@ -68,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse createProduct(ProductRequest productRequest) {
+    public ProductResponse addProduct(ProductRequest productRequest) {
         Product product = productMapper.toProductRequest(productRequest);
         return productMapper.toProduct( productDao.addProduct(product));
     }

@@ -3,6 +3,7 @@ package com.example.shoppingMall.model;
 import com.example.shoppingMall.enums.ProductStatus;
 
 import java.util.List;
+import java.util.Map;
 
 public class Product {
     private long productId;
@@ -19,12 +20,14 @@ public class Product {
     private ProductStatus productStatus;
     private String productImage;
     private List<ProductImages> productImages;
+    private List<ProductVariation> variations;
+    private Map<String, List<String>> optionInputs;
 
 
     public Product() {
     }
 
-    public Product(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage,List<ProductImages> productImages) {
+    public Product(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, List<ProductImages> productImages, List<ProductVariation> variations, Map<String, List<String>> optionInputs) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -39,7 +42,24 @@ public class Product {
         this.productStatus = productStatus;
         this.productImage = productImage;
         this.productImages = productImages;
+        this.variations = variations;
+        this.optionInputs = optionInputs;
+    }
 
+    public List<ProductVariation> getVariations() {
+        return variations;
+    }
+
+    public void setVariations(List<ProductVariation> variations) {
+        this.variations = variations;
+    }
+
+    public Map<String, List<String>> getOptionInputs() {
+        return optionInputs;
+    }
+
+    public void setOptionInputs(Map<String, List<String>> optionInputs) {
+        this.optionInputs = optionInputs;
     }
 
     public long getProductId() {
