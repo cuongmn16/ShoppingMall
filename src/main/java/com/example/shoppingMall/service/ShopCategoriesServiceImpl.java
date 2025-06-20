@@ -34,9 +34,9 @@ public class ShopCategoriesServiceImpl implements ShopCategoriesService {
     }
 
     @Override
-    public ShopCategoriesResponse addShopCategory(ShopCategoriesRequest shopCategoriesRequest) {
+    public ShopCategoriesResponse createShopCategory(ShopCategoriesRequest shopCategoriesRequest) {
         ShopCategories shopCategories = shopCategoriesMapper.toShopCategories(shopCategoriesRequest);
-        shopCategoriesDao.addShopCategory(shopCategories);
+        shopCategoriesDao.createShopCategory(shopCategories);
         return shopCategoriesMapper.toShopCategoriesResponse(shopCategories);
     }
 
@@ -59,4 +59,13 @@ public class ShopCategoriesServiceImpl implements ShopCategoriesService {
         shopCategoriesDao.deleteShopCategory(categoryId);
 
     }
+
+    @Override
+    public List<ShopCategoriesResponse> getAllShopCategoriesByParentId(Long parentId) {
+        return shopCategoriesDao.getAllShopCategoriesByParentId(parentId)
+                .stream()
+                .map(shopCategoriesMapper::toShopCategoriesResponse)
+                .toList();
+    }
+
 }

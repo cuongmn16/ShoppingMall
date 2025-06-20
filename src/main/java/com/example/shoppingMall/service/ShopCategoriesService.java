@@ -10,10 +10,11 @@ public interface ShopCategoriesService {
 
     ShopCategoriesResponse getShopCategoryById(long categoryId);
 
-    ShopCategoriesResponse addShopCategory(ShopCategoriesRequest shopCategoriesRequest);
+    ShopCategoriesResponse createShopCategory(ShopCategoriesRequest shopCategoriesRequest);
 
     void updateShopCategory(long categoryId, ShopCategoriesRequest shopCategoriesRequest);
 
     void deleteShopCategory(long categoryId);
 
+    List<ShopCategoriesResponse> getAllShopCategoriesByParentId(Long parentId);
 }

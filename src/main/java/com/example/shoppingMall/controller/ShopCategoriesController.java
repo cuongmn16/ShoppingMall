@@ -22,10 +22,17 @@ public class ShopCategoriesController {
         return apiResponse;
     }
 
+    @GetMapping("/parent/{parentId}")
+    public ApiResponse<List<ShopCategoriesResponse>> getCategoriesByParentId(@PathVariable Long parentId) {
+        ApiResponse<List<ShopCategoriesResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(shopCategoriesService.getAllShopCategoriesByParentId(parentId));
+        return apiResponse;
+    }
+
     @PostMapping
     public ApiResponse<ShopCategoriesResponse> createShopCategory(@RequestBody ShopCategoriesRequest shopCategoriesRequest) {
         ApiResponse<ShopCategoriesResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(shopCategoriesService.addShopCategory(shopCategoriesRequest));
+        apiResponse.setResult(shopCategoriesService.createShopCategory(shopCategoriesRequest));
         return apiResponse;
     }
 

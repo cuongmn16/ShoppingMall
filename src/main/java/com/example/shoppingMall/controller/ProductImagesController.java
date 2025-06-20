@@ -6,10 +6,7 @@ import com.example.shoppingMall.dto.response.ProductImagesResponse;
 import com.example.shoppingMall.dto.response.ProductResponse;
 import com.example.shoppingMall.service.ProductImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class ProductImagesController {
         return apiResponse;
     }
 
-    @GetMapping("/product/{productId}")
+    @DeleteMapping("/product/{productId}")
     public ApiResponse<ProductImagesResponse> deleteProductImageById(@PathVariable long productId, long imageId) {
         ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
         productImagesService.deleteProductImage(productId, imageId);
@@ -42,14 +39,14 @@ public class ProductImagesController {
         return apiResponse;
     }
 
-    @GetMapping("/add/{productId}")
+    @PostMapping("/add/{productId}")
     public ApiResponse<ProductImagesResponse> addProductImage(@PathVariable long productId, ProductImagesRequest productImagesRequest) {
         ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(productImagesService.addProductImage(productId, productImagesRequest));
         return apiResponse;
     }
 
-    @GetMapping("/update/{productId}")
+    @PostMapping("/update/{productId}")
     public ApiResponse<ProductImagesResponse> updateProductImage(@PathVariable long productId, long imageId, ProductImagesRequest productImagesRequest) {
         ApiResponse<ProductImagesResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(productImagesService.updateProductImage(productId, imageId, productImagesRequest));

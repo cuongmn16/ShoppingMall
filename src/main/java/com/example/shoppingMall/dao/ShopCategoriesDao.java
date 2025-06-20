@@ -9,7 +9,9 @@ public interface ShopCategoriesDao {
 
     ShopCategories getShopCategoryById(long categoryId);
 
-    ShopCategories addShopCategory(ShopCategories shopCategory);
+    List<ShopCategories> getAllShopCategoriesByParentId(long parentId);
+
+    ShopCategories createShopCategory(ShopCategories shopCategory);
 
     void updateShopCategory(long categoryId,ShopCategories shopCategory);
 

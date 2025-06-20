@@ -8,16 +8,18 @@ public class ShopCategories implements Serializable {
     private String categoryName;
     private String iconUrl;
     private Boolean isActive;
+    private Long parentId;
     private List<Product> products;
     public ShopCategories() {
     }
 
-    public ShopCategories(long categoryId, String categoryName, String iconUrl, Boolean isActive, List<Product> products) {
+    public ShopCategories(long categoryId, String categoryName, String iconUrl, Boolean isActive, long parentId, List<Product> products) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.iconUrl = iconUrl;
         this.isActive = isActive;
         this.products = products;
+        this.parentId = parentId;
     }
 
     public long getCategoryId() {
@@ -58,5 +60,13 @@ public class ShopCategories implements Serializable {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
     }
 }
