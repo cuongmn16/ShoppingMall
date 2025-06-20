@@ -1,7 +1,10 @@
 package com.example.shoppingMall.dao;
 
+import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.enums.ProductStatus;
 import com.example.shoppingMall.model.Product;
+import com.example.shoppingMall.model.ProductImages;
+import com.example.shoppingMall.model.ProductVariation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ProductDaoImpl implements ProductDao {
@@ -139,16 +144,17 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public Product getProductById(long productId) {
-        Product product = null;
-        String sql = "SELECT * FROM products" +
+    public ProductDetailResponse getProductById(long productId) {
+        ProductDetailResponse product = null;
+        String sql = "SELECT p.*, s.*  FROM products p " +
+                "INNER JOIN sellers s ON p.seller_id = s.seller_id" +
                 " WHERE product_id = ?";
         try(Connection conn = dataSource.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, productId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                product = new Product();
+                product = new ProductDetailResponse();
                 product.setProductId(rs.getLong("product_id"));
                 product.setSellerId(rs.getLong("seller_id"));
                 product.setCategoryId(rs.getLong("category_id"));
@@ -160,6 +166,9 @@ public class ProductDaoImpl implements ProductDao {
                 product.setStockQuantity(rs.getInt("stock_quantity"));
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setRating(rs.getDouble("rating"));
+                product.setShopName(rs.getString("shop_name"));
+                product.setShopDescription(rs.getString("shop_description"));
+                product.setShopLogo(rs.getString("shop_logo"));
 
                 String productStatus = rs.getString("status");
                 if(productStatus != null) {
@@ -176,32 +185,180 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product addProduct(Product product) {
-        String sql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, status) " +
+        String insertProductSql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, product.getSellerId());
-            stmt.setLong(2, product.getCategoryId());
-            stmt.setString(3, product.getProductName());
-            stmt.setDouble(4, product.getPrice());
-            stmt.setDouble(5, product.getOriginalPrice());
-            stmt.setDouble(6, product.getDiscount());
-            stmt.setLong(7, product.getStockQuantity());
-            stmt.setString(8, product.getProductStatus().name());
+        String insertOptionTypeSql = "INSERT INTO option_type (name) VALUES (?) ON DUPLICATE KEY UPDATE option_type_id=option_type_id";
+        String insertOptionValueSql = "INSERT INTO option_value (option_type_id, value) VALUES (?, ?) ON DUPLICATE KEY UPDATE option_value_id=LAST_INSERT_ID(option_value_id)";
+        String insertProductOptionValueSql = "INSERT INTO product_option_value (product_id, option_value_id) VALUES (?, ?)";
+        String insertVariationSql = "INSERT INTO product_variation (product_id, sku, price, quantity) VALUES (?, ?, ?, ?)";
+        String insertVariationOptionValSql = "INSERT INTO product_variation_option_value (variation_id, option_value_id) VALUES (?, ?)";
+        String insertProductImageSql = "INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES (?, ?, ?, ?)";
 
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows > 0) {
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    product.setProductId(generatedKeys.getLong(1));
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false); // Bắt đầu giao dịch
+
+            // Map để lưu option_type_id và option_value_id
+            Map<String, Long> optionTypeMap = new HashMap<>();
+            Map<String, Long> optionValueMap = new HashMap<>();
+
+            // Insert vào bảng products
+            try (PreparedStatement productStmt = conn.prepareStatement(insertProductSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                productStmt.setLong(1, product.getSellerId());
+                productStmt.setLong(2, product.getCategoryId());
+                productStmt.setString(3, product.getProductName());
+                productStmt.setDouble(4, product.getPrice());
+                productStmt.setDouble(5, product.getOriginalPrice());
+                productStmt.setDouble(6, product.getDiscount());
+                productStmt.setLong(7, product.getStockQuantity());
+                productStmt.setString(8, product.getProductStatus().name());
+
+                int affectedRows = productStmt.executeUpdate();
+                if (affectedRows > 0) {
+                    try (ResultSet generatedKeys = productStmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            product.setProductId(generatedKeys.getLong(1));
+                        }
+                    }
+                } else {
+                    conn.rollback();
+                    throw new SQLException("Failed to insert product");
+                }
+            }
+
+            // Insert vào bảng product_images
+            if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
+                try (PreparedStatement imageStmt = conn.prepareStatement(insertProductImageSql)) {
+                    for (ProductImages image : product.getProductImages()) {
+                        imageStmt.setLong(1, product.getProductId());
+                        imageStmt.setString(2, image.getImageUrl());
+                        imageStmt.setBoolean(3, image.getPrimary());
+                        imageStmt.setLong(4, image.getDisplayOrder());
+                        imageStmt.addBatch();
+                    }
+                    imageStmt.executeBatch();
+                }
+            }
+
+            // Tự động sinh option_type và option_value từ dữ liệu đầu vào
+            Map<String, List<String>> optionInputs = product.getOptionInputs();
+            if (optionInputs != null) {
+                try (PreparedStatement optionTypeStmt = conn.prepareStatement(insertOptionTypeSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    for (String optionTypeName : optionInputs.keySet()) {
+                        optionTypeStmt.setString(1, optionTypeName);
+                        optionTypeStmt.executeUpdate();
+                        try (ResultSet optionTypeKeys = optionTypeStmt.getGeneratedKeys()) {
+                            if (optionTypeKeys.next()) {
+                                optionTypeMap.put(optionTypeName, optionTypeKeys.getLong(1));
+                            } else {
+                                try (PreparedStatement selectStmt = conn.prepareStatement("SELECT option_type_id FROM option_type WHERE name = ?")) {
+                                    selectStmt.setString(1, optionTypeName);
+                                    try (ResultSet rs = selectStmt.executeQuery()) {
+                                        if (rs.next()) {
+                                            optionTypeMap.put(optionTypeName, rs.getLong("option_type_id"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
+                try (PreparedStatement optionValueStmt = conn.prepareStatement(insertOptionValueSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    for (Map.Entry<String, List<String>> entry : optionInputs.entrySet()) {
+                        Long optionTypeId = optionTypeMap.get(entry.getKey());
+                        for (String value : entry.getValue()) {
+                            optionValueStmt.setLong(1, optionTypeId);
+                            optionValueStmt.setString(2, value);
+                            optionValueStmt.executeUpdate();
+                            try (ResultSet optionValueKeys = optionValueStmt.getGeneratedKeys()) {
+                                if (optionValueKeys.next()) {
+                                    optionValueMap.put(entry.getKey() + "_" + value, optionValueKeys.getLong(1));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Liên kết với product_option_value
+                try (PreparedStatement optionValStmt = conn.prepareStatement(insertProductOptionValueSql)) {
+                    for (Map.Entry<String, List<String>> entry : optionInputs.entrySet()) {
+                        for (String value : entry.getValue()) {
+                            Long optionValueId = optionValueMap.get(entry.getKey() + "_" + value);
+                            if (optionValueId != null) {
+                                optionValStmt.setLong(1, product.getProductId());
+                                optionValStmt.setLong(2, optionValueId);
+                                optionValStmt.addBatch();
+                            }
+                        }
+                    }
+                    optionValStmt.executeBatch();
+                }
             }
+
+            // Insert vào bảng product_variation
+            try (PreparedStatement variationStmt = conn.prepareStatement(insertVariationSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                for (ProductVariation variation : product.getVariations()) {
+                    variationStmt.setLong(1, product.getProductId());
+                    variationStmt.setString(2, variation.getSku());
+                    variationStmt.setDouble(3, variation.getPrice());
+                    variationStmt.setLong(4, variation.getQuantity());
+                    int variationRows = variationStmt.executeUpdate();
+                    if (variationRows > 0) {
+                        try (ResultSet variationKeys = variationStmt.getGeneratedKeys()) {
+                            if (variationKeys.next()) {
+                                variation.setVariationId(variationKeys.getLong(1));
+                                // Liên kết với product_variation_option_val
+                                try (PreparedStatement optionValStmt = conn.prepareStatement(insertVariationOptionValSql)) {
+                                    for (String optionInput : variation.getOptionInputs()) {
+                                        String[] parts = optionInput.split(":");
+                                        if (parts.length == 2) {
+                                            String type = parts[0].trim();
+                                            String value = parts[1].trim();
+                                            Long optionValueId = optionValueMap.get(type + "_" + value);
+                                            if (optionValueId != null) {
+                                                optionValStmt.setLong(1, variation.getVariationId());
+                                                optionValStmt.setLong(2, optionValueId);
+                                                optionValStmt.addBatch();
+                                            }
+                                        }
+                                    }
+                                    optionValStmt.executeBatch();
+                                }
+                            }
+                        }
+                    } else {
+                        conn.rollback();
+                        throw new SQLException("Failed to insert variation");
+                    }
+                }
+            }
+
+            conn.commit(); // Hoàn tất giao dịch
             return product;
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Rollback failed", ex);
+                }
+            }
+            throw new RuntimeException("Error adding product: " + e.getMessage(), e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException("Error closing connection", e);
+                }
+            }
         }
     }
+
 
     @Override
     public Product updateProduct(long productId, Product product) {

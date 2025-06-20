@@ -11,8 +11,6 @@ import org.mapstruct.Mapping;
 public interface ProductMapper {
 
     @Mapping(target = "productImages", ignore = true)
-    @Mapping(target = "productAttributes", ignore = true)
-    @Mapping(target = "productVariations", ignore = true)
     Product toProductRequest(ProductRequest productRequest);
 
     ProductResponse toProduct(Product product);
