@@ -31,7 +31,7 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
                shopCategory.setCategoryName(rs.getString("category_name"));
                shopCategory.setIconUrl(rs.getString("icon_url"));
                shopCategory.setActive(rs.getBoolean("is_active"));
-                shopCategory.setParentId(rs.getObject("parent_id") != null ? rs.getLong("parent_id") : null);
+               shopCategory.setParentId(rs.getInt("parent_id"));
 
                 shopCategories.add(shopCategory);
             }
@@ -55,7 +55,7 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
                 shopCategory.setCategoryName(rs.getString("category_name"));
                 shopCategory.setIconUrl(rs.getString("icon_url"));
                 shopCategory.setActive(rs.getBoolean("is_active"));
-                shopCategory.setParentId(rs.getObject("parent_id") != null ? rs.getLong("parent_id") : null);
+                shopCategory.setParentId( rs.getLong("parent_id"));
 
             }
             return shopCategory;
@@ -79,7 +79,7 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
                 shopCategory.setCategoryName(rs.getString("category_name"));
                 shopCategory.setIconUrl(rs.getString("icon_url"));
                 shopCategory.setActive(rs.getBoolean("is_active"));
-                shopCategory.setParentId(rs.getObject("parent_id") != null ? rs.getLong("parent_id") : null);
+                shopCategory.setParentId(rs.getLong("parent_id"));
 
                 shopCategories.add(shopCategory);
             }

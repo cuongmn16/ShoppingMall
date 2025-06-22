@@ -28,6 +28,7 @@ public class AuthenticationController {
 
         ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(result);
+        apiResponse.setMessage("login successful!");
         return apiResponse;
     }
 
