@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShopCategoriesServiceImpl implements ShopCategoriesService {
@@ -67,5 +68,14 @@ public class ShopCategoriesServiceImpl implements ShopCategoriesService {
                 .map(shopCategoriesMapper::toShopCategoriesResponse)
                 .toList();
     }
+
+    @Override
+    public List<ShopCategoriesResponse> getCategoriesByParentNull() {
+        List<ShopCategories> entities = shopCategoriesDao.findCategoriesByParentNull();
+        return entities.stream()
+                .map(shopCategoriesMapper::toShopCategoriesResponse)
+                .collect(Collectors.toList());
+    }
+
 
 }

@@ -31,7 +31,11 @@ import java.util.List;
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
              "/api/auth/token", "/api/auth/introspect", "/api/auth/logout", "/api/auth/refresh",
-            "/api/**"
+            "/api/**", // API của bạn
+            "/swagger-ui/**",          // UI Swagger
+            "/v3/api-docs/**",         // Swagger JSON spec
+            "/swagger-resources/**",   // Tài nguyên Swagger
+            "/webjars/**"
     };
 
     @Value("${jwt.signerKey}")
@@ -43,6 +47,7 @@ public class SecurityConfig {
                 request.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated());
         httpSecurity
                 .cors(cors -> {})

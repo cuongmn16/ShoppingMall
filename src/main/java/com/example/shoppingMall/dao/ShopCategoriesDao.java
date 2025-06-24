@@ -19,5 +19,6 @@ public interface ShopCategoriesDao {
 
     boolean isShopCategoryExistsById(long categoryId);
 
+    List<ShopCategories> findCategoriesByParentNull();
 
 }

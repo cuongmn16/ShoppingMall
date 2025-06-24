@@ -66,7 +66,7 @@ public class ShopCategories implements Serializable {
         return parentId;
     }
 
-    public void setParentId(long parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 }

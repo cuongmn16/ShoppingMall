@@ -17,4 +17,6 @@ public interface ShopCategoriesService {
     void deleteShopCategory(long categoryId);
 
     List<ShopCategoriesResponse> getAllShopCategoriesByParentId(Long parentId);
+
+    List<ShopCategoriesResponse> getCategoriesByParentNull();
 }

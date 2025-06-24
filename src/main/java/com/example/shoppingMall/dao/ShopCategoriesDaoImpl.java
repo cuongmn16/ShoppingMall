@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +28,7 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
                shopCategory.setCategoryName(rs.getString("category_name"));
                shopCategory.setIconUrl(rs.getString("icon_url"));
                shopCategory.setActive(rs.getBoolean("is_active"));
-               shopCategory.setParentId(rs.getInt("parent_id"));
+               shopCategory.setParentId(rs.getObject("parent_id", Long.class));
 
                 shopCategories.add(shopCategory);
             }
@@ -92,23 +89,43 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
     @Override
     public ShopCategories createShopCategory(ShopCategories shopCategory) {
         String sql = "INSERT INTO shop_categories (category_name, icon_url, is_active, parent_id) VALUES (?, ?, ?, ?)";
-        try(Connection conn = dataSource.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(sql)){
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setString(1, shopCategory.getCategoryName());
             stmt.setString(2, shopCategory.getIconUrl());
-            stmt.setBoolean(3, shopCategory.getActive());
-            stmt.setObject(4, shopCategory.getParentId());
 
-            if(shopCategory.getActive() == null) {
+            if (shopCategory.getActive() == null) {
                 shopCategory.setActive(true);
             }
             stmt.setBoolean(3, shopCategory.getActive());
+
+            if (shopCategory.getParentId() != null) {
+                stmt.setInt(4, shopCategory.getParentId().intValue());
+            } else {
+                stmt.setNull(4, java.sql.Types.INTEGER);
+            }
+
             stmt.executeUpdate();
+
+            // lấy ID vừa tạo
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    long generatedId = rs.getLong(1);
+                    shopCategory.setCategoryId(generatedId);
+                } else {
+                    System.out.println("Không nhận được generated key");
+                }
+            }
+
             return shopCategory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi SQL: " + e.getMessage(), e);
         }
     }
+
+
 
     @Override
     public void updateShopCategory(long categoryId, ShopCategories shopCategory) {
@@ -199,4 +216,32 @@ public class ShopCategoriesDaoImpl implements ShopCategoriesDao{
     }
         return false;
     }
+
+    @Override
+    public List<ShopCategories> findCategoriesByParentNull() {
+        String sql = "SELECT * FROM shop_categories WHERE parent_id IS NULL";
+        List<ShopCategories> categories = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                ShopCategories category = new ShopCategories();
+                category.setCategoryId(rs.getLong("category_id"));
+                category.setCategoryName(rs.getString("category_name"));
+                category.setIconUrl(rs.getString("icon_url"));
+                category.setActive(rs.getBoolean("is_active"));
+                category.setParentId(null); // vì parent_id là null
+
+                categories.add(category);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return categories;
+    }
+
 }
