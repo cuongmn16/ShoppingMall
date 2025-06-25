@@ -44,5 +44,17 @@ public class ShopCategoriesController {
         return apiResponse;
     }
 
+//    @PostMapping("/bulk")
+//    public ApiResponse<List<ShopCategoriesResponse>> createShopCategories(@RequestBody List<ShopCategoriesRequest> shopCategoriesRequests) {
+//        List<ShopCategoriesResponse> responses = shopCategoriesRequests.stream()
+//                .map(shopCategoriesService::createShopCategory)
+//                .toList();
+//
+//        ApiResponse<List<ShopCategoriesResponse>> apiResponse = new ApiResponse<>();
+//        apiResponse.setResult(responses);
+//        return apiResponse;
+//    }
+
+
 
 }

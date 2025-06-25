@@ -16,4 +16,7 @@ public interface ProductService {
 
     ProductResponse addProduct(ProductRequest productRequest);
 
+    ProductResponse updateProduct(long productId, ProductRequest productRequest);
+
+    List<ProductResponse> findProductsByKeyword(String keyword);
 }

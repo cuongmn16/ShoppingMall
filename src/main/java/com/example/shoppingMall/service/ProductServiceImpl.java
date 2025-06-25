@@ -73,5 +73,31 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toProduct( productDao.addProduct(product));
     }
 
+    @Override
+    public ProductResponse updateProduct(long productId, ProductRequest productRequest) {
+        // Chuyển đổi DTO sang entity
+        Product product = productMapper.toProductRequest(productRequest);
+        product.setProductId(productId);
+
+        // Gọi DAO update
+        Product updatedProduct = productDao.updateProduct(productId, product);
+
+        if (updatedProduct == null) {
+            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        return productMapper.toProduct(updatedProduct);
+    }
+
+
+    @Override
+    public List<ProductResponse> findProductsByKeyword(String keyword) {
+        return productDao.findProductsByKeyword(keyword)
+                .stream()
+                .map(productMapper::toProduct)
+                .toList();
+    }
+
+
 
 }

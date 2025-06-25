@@ -362,8 +362,41 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public Product updateProduct(long productId, Product product) {
+        String sql = """
+                UPDATE products 
+                SET product_name = ?, 
+                    description = ?, 
+                    price = ?, 
+                    original_price = ?, 
+                    discount = ?, 
+                    stock_quantity = ?, 
+                    status = ? 
+                WHERE product_id = ?
+            """;
 
-        return null;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, product.getProductName());
+            stmt.setString(2, product.getDescription());
+            stmt.setDouble(3, product.getPrice());
+            stmt.setDouble(4, product.getOriginalPrice());
+            stmt.setDouble(5, product.getDiscount());
+            stmt.setLong(6, product.getStockQuantity());
+            stmt.setString(7, product.getProductStatus().name());
+            stmt.setLong(8, productId);
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new RuntimeException("Không tìm thấy sản phẩm để cập nhật với ID = " + productId);
+            }
+
+            product.setProductId(productId);
+            return product;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi cập nhật sản phẩm: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -377,4 +410,61 @@ public class ProductDaoImpl implements ProductDao {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<Product> findProductsByKeyword(String keyword) {
+        final String sql = """
+        SELECT 
+            p.product_id, p.seller_id, p.category_id, p.product_name, 
+            p.description, p.price, p.original_price, p.discount,
+            p.stock_quantity, p.sold_quantity, p.rating, p.status,
+            pi.image_url
+        FROM products p
+        LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1
+        WHERE LOWER(p.product_name) LIKE ? OR LOWER(p.description) LIKE ?
+        ORDER BY p.product_name
+        """;
+
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String likePattern = "%" + keyword.toLowerCase() + "%";
+            stmt.setString(1, likePattern);
+            stmt.setString(2, likePattern);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Product product = new Product();
+
+                    product.setProductId(rs.getLong("product_id"));
+                    product.setSellerId(rs.getLong("seller_id"));
+                    product.setCategoryId(rs.getLong("category_id"));
+                    product.setProductName(rs.getString("product_name"));
+                    product.setDescription(rs.getString("description"));
+                    product.setPrice(rs.getDouble("price"));
+                    product.setOriginalPrice(rs.getDouble("original_price"));
+                    product.setDiscount(rs.getDouble("discount"));
+                    product.setStockQuantity(rs.getInt("stock_quantity"));
+                    product.setSoldQuantity(rs.getInt("sold_quantity"));
+                    product.setRating(rs.getDouble("rating"));
+                    product.setProductImage(rs.getString("image_url"));
+
+                    String statusStr = rs.getString("status");
+                    if (statusStr != null) {
+                        product.setProductStatus(ProductStatus.valueOf(statusStr));
+                    }
+
+                    products.add(product);
+                }
+            }
+
+            return products;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi tìm kiếm sản phẩm: " + e.getMessage(), e);
+        }
+    }
+
 }

@@ -17,4 +17,6 @@ public interface ProductDao {
     Product updateProduct(long productId, Product product);
 
     void deleteProduct(long productId);
+
+    List<Product> findProductsByKeyword(String keyword);
 }
