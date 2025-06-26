@@ -98,6 +98,13 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
+    @Override
+    public List<ProductResponse> getRecommendedProducts(int limit) {
+        return productDao.getRecommendedProducts(limit)
+                .stream()
+                .map(productMapper::toProduct)
+                .toList();
+    }
 
 
 }

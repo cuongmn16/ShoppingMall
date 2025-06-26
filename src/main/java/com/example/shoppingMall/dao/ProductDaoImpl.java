@@ -467,4 +467,59 @@ public class ProductDaoImpl implements ProductDao {
         }
     }
 
+    @Override
+    public List<Product> getRecommendedProducts(int limit) {
+        String sql = """
+        SELECT 
+            p.product_id, p.seller_id, p.category_id, p.product_name,
+            p.description, p.price, p.original_price, p.discount,
+            p.stock_quantity, p.sold_quantity, p.rating, p.status,
+            pi.image_url
+        FROM products p
+        LEFT JOIN product_images pi 
+               ON p.product_id = pi.product_id AND pi.is_primary = 1
+        ORDER BY RAND()          -- random trên MySQL
+        LIMIT ?
+        """;
+
+        List<Product> products = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Product product = new Product();
+                    product.setProductId   (rs.getLong   ("product_id"));
+                    product.setSellerId    (rs.getLong   ("seller_id"));
+                    product.setCategoryId  (rs.getLong   ("category_id"));
+                    product.setProductName (rs.getString ("product_name"));
+                    product.setDescription (rs.getString ("description"));
+                    product.setPrice       (rs.getDouble ("price"));
+                    product.setOriginalPrice(rs.getDouble("original_price"));
+                    product.setDiscount    (rs.getDouble ("discount"));
+                    product.setStockQuantity(rs.getInt   ("stock_quantity"));
+                    product.setSoldQuantity(rs.getInt   ("sold_quantity"));
+                    product.setRating      (rs.getDouble ("rating"));
+                    product.setProductImage(rs.getString ("image_url"));
+
+                    String statusStr = rs.getString("status");
+                    product.setProductStatus(
+                            statusStr != null ? ProductStatus.valueOf(statusStr)
+                                    : ProductStatus.ACTIVE);
+
+                    products.add(product);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching recommended products", e);
+        }
+
+        return products;
+    }
+
+
 }

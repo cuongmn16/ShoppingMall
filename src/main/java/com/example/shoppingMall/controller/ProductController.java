@@ -50,4 +50,19 @@ public class ProductController {
         apiResponse.setResult(productResponse);
         return apiResponse;
     }
+
+    @GetMapping("/recommended")
+    public ApiResponse<List<ProductResponse>> getRecommendedProducts(
+            @RequestParam(defaultValue = "6") int limit) {
+
+        List<ProductResponse> data = productService.getRecommendedProducts(limit);
+
+        ApiResponse<List<ProductResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setCode(200);
+        apiResponse.setMessage("success");
+        apiResponse.setResult(data);
+
+        return apiResponse;
+    }
+
 }

@@ -19,4 +19,7 @@ public interface ProductService {
     ProductResponse updateProduct(long productId, ProductRequest productRequest);
 
     List<ProductResponse> findProductsByKeyword(String keyword);
+
+    List<ProductResponse> getRecommendedProducts(int limit);
+
 }

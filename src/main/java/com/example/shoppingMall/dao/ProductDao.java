@@ -19,4 +19,6 @@ public interface ProductDao {
     void deleteProduct(long productId);
 
     List<Product> findProductsByKeyword(String keyword);
+
+    List<Product> getRecommendedProducts(int limit);
 }
