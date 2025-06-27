@@ -1,44 +1,31 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.request;
 
 import com.example.shoppingMall.enums.OrderStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
-public class Orders {
-    private long orderId;
+public class OrdersRequest {
     private long userId;
     private Long shippingAddressId;
-    private OrderStatus orderStatus;
+    private OrderStatus status;
     private BigDecimal totalAmount;
     private BigDecimal shippingFee;
     private BigDecimal discountAmount;
-    private LocalDate dateTime;
-    private List<OrderItems> orderItems;
-    private OrderStatus status;
+    private List<OrderItemsRequest> orderItems;
 
-    public Orders() {
-    }
+    public OrdersRequest() {}
 
-    public Orders(long orderId, long userId, long shippingAddressId, OrderStatus orderStatus, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate dateTime, List<OrderItems> orderItems) {
-        this.orderId = orderId;
+    public OrdersRequest(long userId, Long shippingAddressId, OrderStatus status,
+                        BigDecimal totalAmount, BigDecimal shippingFee,
+                        BigDecimal discountAmount, List<OrderItemsRequest> orderItems) {
         this.userId = userId;
         this.shippingAddressId = shippingAddressId;
-        this.orderStatus = orderStatus;
+        this.status = status;
         this.totalAmount = totalAmount;
         this.shippingFee = shippingFee;
         this.discountAmount = discountAmount;
-        this.dateTime = dateTime;
         this.orderItems = orderItems;
-    }
-
-    public long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(long orderId) {
-        this.orderId = orderId;
     }
 
     public long getUserId() {
@@ -57,12 +44,12 @@ public class Orders {
         this.shippingAddressId = shippingAddressId;
     }
 
-    public OrderStatus getOrderStatus() {
-        return orderStatus;
+    public OrderStatus getStatus() {
+        return status;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
+    public void setStatus(OrderStatus status) {
+        this.status = status;
     }
 
     public BigDecimal getTotalAmount() {
@@ -89,28 +76,11 @@ public class Orders {
         this.discountAmount = discountAmount;
     }
 
-    public LocalDate getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDate dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public List<OrderItems> getOrderItems() {
+    public List<OrderItemsRequest> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(List<OrderItems> orderItems) {
+    public void setOrderItems(List<OrderItemsRequest> orderItems) {
         this.orderItems = orderItems;
     }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
 }

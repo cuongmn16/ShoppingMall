@@ -1,35 +1,38 @@
-package com.example.shoppingMall.model;
+package com.example.shoppingMall.dto.response;
 
 import com.example.shoppingMall.enums.OrderStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.List;
 
-public class Orders {
+public class OrdersResponse {
     private long orderId;
     private long userId;
     private Long shippingAddressId;
-    private OrderStatus orderStatus;
+    private OrderStatus status;
     private BigDecimal totalAmount;
     private BigDecimal shippingFee;
     private BigDecimal discountAmount;
-    private LocalDate dateTime;
-    private List<OrderItems> orderItems;
-    private OrderStatus status;
+    private Timestamp createAt;
+    private Timestamp updateAt;
+    private List<OrderItemsResponse> orderItems;
 
-    public Orders() {
-    }
+    public OrdersResponse() {}
 
-    public Orders(long orderId, long userId, long shippingAddressId, OrderStatus orderStatus, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate dateTime, List<OrderItems> orderItems) {
+    public OrdersResponse(long orderId, long userId, Long shippingAddressId,
+                          OrderStatus status, BigDecimal totalAmount,
+                          BigDecimal shippingFee, BigDecimal discountAmount,
+                          Timestamp createAt, Timestamp updateAt, List<OrderItemsResponse> orderItems) {
         this.orderId = orderId;
         this.userId = userId;
         this.shippingAddressId = shippingAddressId;
-        this.orderStatus = orderStatus;
+        this.status = status;
         this.totalAmount = totalAmount;
         this.shippingFee = shippingFee;
         this.discountAmount = discountAmount;
-        this.dateTime = dateTime;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
         this.orderItems = orderItems;
     }
 
@@ -57,12 +60,12 @@ public class Orders {
         this.shippingAddressId = shippingAddressId;
     }
 
-    public OrderStatus getOrderStatus() {
-        return orderStatus;
+    public OrderStatus getStatus() {
+        return status;
     }
 
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
+    public void setStatus(OrderStatus status) {
+        this.status = status;
     }
 
     public BigDecimal getTotalAmount() {
@@ -89,28 +92,27 @@ public class Orders {
         this.discountAmount = discountAmount;
     }
 
-    public LocalDate getDateTime() {
-        return dateTime;
+    public Timestamp getCreateAt() {
+        return createAt;
     }
 
-    public void setDateTime(LocalDate dateTime) {
-        this.dateTime = dateTime;
+    public void setCreateAt(Timestamp createAt) {
+        this.createAt = createAt;
     }
 
-    public List<OrderItems> getOrderItems() {
+    public Timestamp getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(Timestamp updateAt) {
+        this.updateAt = updateAt;
+    }
+
+    public List<OrderItemsResponse> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(List<OrderItems> orderItems) {
+    public void setOrderItems(List<OrderItemsResponse> orderItems) {
         this.orderItems = orderItems;
     }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
 }

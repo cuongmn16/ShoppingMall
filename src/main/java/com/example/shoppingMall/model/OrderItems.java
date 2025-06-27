@@ -2,16 +2,16 @@ package com.example.shoppingMall.model;
 
 public class OrderItems {
     private long itemId;
-    private long orderId;
-    private long productId;
+    private Long orderId;
+    private Long productId;
     private long variationId;
-    private int quantity;
+    private Integer quantity;
     private double unitPrice;
 
     public OrderItems() {
     }
 
-    public OrderItems(long itemId, long orderId, long productId, long variationId, int quantity, double unitPrice) {
+    public OrderItems(long itemId, Long orderId, Long productId, long variationId, Integer quantity, double unitPrice) {
         this.itemId = itemId;
         this.orderId = orderId;
         this.productId = productId;
@@ -28,19 +28,19 @@ public class OrderItems {
         this.itemId = itemId;
     }
 
-    public long getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
-    public long getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(long productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
