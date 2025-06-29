@@ -21,7 +21,7 @@ public class OrderItemsController {
     public ApiResponse<List<OrderItemsResponse>> getItemsByOrder(
             @PathVariable long orderId) {
 
-        List<OrderItemsResponse> data = orderItemsService.getAllOrderItems(orderId);
+        List<OrderItemsResponse> data = orderItemsService.getItemsByOrderId(orderId);
 
         ApiResponse<List<OrderItemsResponse>> api = new ApiResponse<>();
         api.setResult(data);
@@ -31,7 +31,7 @@ public class OrderItemsController {
     /** Lấy chi tiết 1 item */
     @GetMapping("/{itemId}")
     public ApiResponse<OrderItemsResponse> getItem(@PathVariable long itemId) {
-        OrderItemsResponse data = orderItemsService.getOrderItem(itemId);
+        OrderItemsResponse data = orderItemsService.getItemById(itemId);
 
         ApiResponse<OrderItemsResponse> api = new ApiResponse<>();
         api.setResult(data);
@@ -41,7 +41,7 @@ public class OrderItemsController {
     /** Thêm mới item vào đơn */
     @PostMapping
     public ApiResponse<OrderItemsResponse> addItem(@RequestBody OrderItemsRequest req) {
-        OrderItemsResponse data = orderItemsService.addOrderItem(req);
+        OrderItemsResponse data = orderItemsService.createItem(req);
 
         ApiResponse<OrderItemsResponse> api = new ApiResponse<>();
         api.setResult(data);
@@ -54,19 +54,10 @@ public class OrderItemsController {
             @PathVariable long itemId,
             @RequestBody OrderItemsRequest req) {
 
-        OrderItemsResponse data = orderItemsService.updateOrderItem(itemId, req);
+        OrderItemsResponse data = orderItemsService.updateItem(itemId, req);
 
         ApiResponse<OrderItemsResponse> api = new ApiResponse<>();
         api.setResult(data);
-        return api;
-    }
-
-    /** (Tuỳ chọn) Xoá item */
-    @DeleteMapping("/{itemId}")
-    public ApiResponse<Void> deleteItem(@PathVariable long itemId) {
-        orderItemsService.deleteOrderItem(itemId);   // Nếu bạn có hàm delete
-        ApiResponse<Void> api = new ApiResponse<>();
-        api.setMessage("Deleted");
         return api;
     }
 }

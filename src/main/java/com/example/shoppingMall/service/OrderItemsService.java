@@ -12,7 +12,7 @@ public interface OrderItemsService {
 
     OrderItemsResponse createItem(OrderItemsRequest request);
 
-    void updateItem(long itemId, OrderItemsRequest request);
+    OrderItemsResponse updateItem(long itemId, OrderItemsRequest request);
 
     void deleteItem(long itemId);
 

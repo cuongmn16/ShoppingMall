@@ -44,13 +44,14 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     }
 
     @Override
-    public void updateItem(long itemId, OrderItemsRequest request) {
+    public OrderItemsResponse updateItem(long itemId, OrderItemsRequest request) {
         if (!orderItemsDao.getItemById(itemId).isPresent()) {
             throw new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND);
         }
 
         OrderItems updatedItem = orderItemsMapper.toOrderItems(request);
         orderItemsDao.updateItem(itemId, updatedItem);
+        return null;
     }
 
     @Override
