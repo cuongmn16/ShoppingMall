@@ -18,12 +18,13 @@ public enum ErrorCode {
     ERROR_SQL(1011, "SQL error", HttpStatus.INTERNAL_SERVER_ERROR),
     SHOPCATEGORY_NOT_FOUND(1012, "Shop category not found", HttpStatus.NOT_FOUND),
     PRODUCT_NOT_FOUND(1013, "Product not found", HttpStatus.NOT_FOUND),
-    PRODUCT_IMAGE_NOT_FOUND(1013, "Product image not found", HttpStatus.NOT_FOUND),
+    PRODUCT_IMAGE_NOT_FOUND(1019, "Product image not found", HttpStatus.NOT_FOUND),
     SELLER_NOT_FOUND(1014, "Seller not found", HttpStatus.NOT_FOUND),
     INVALID_OR_MISSING_TOKEN(1015, "Invalid or missing token", HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED(1016, "Token expired", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN(1017, "Invalid token", HttpStatus.UNAUTHORIZED),
-
+    ORDER_ITEM_NOT_FOUND(1018, "Order item not found", HttpStatus.NOT_FOUND),
+    ORDER_NOT_FOUND(1020,"Order not found",HttpStatus.NOT_FOUND),
     ;
 
 

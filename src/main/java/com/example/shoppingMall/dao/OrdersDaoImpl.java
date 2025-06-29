@@ -1,13 +1,14 @@
 package com.example.shoppingMall.dao;
 
-import com.example.shoppingMall.model.Orders;
 import com.example.shoppingMall.enums.OrderStatus;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.shoppingMall.model.OrderItems;
+import com.example.shoppingMall.model.Orders;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,12 @@ public class OrdersDaoImpl implements OrdersDao {
 
     private final DataSource dataSource;
 
+    public OrdersDaoImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /* ───────────────────────── helpers ───────────────────────── */
+
     private Orders mapRow(ResultSet rs) throws SQLException {
         Orders order = new Orders();
         order.setOrderId(rs.getLong("order_id"));
@@ -25,30 +32,60 @@ public class OrdersDaoImpl implements OrdersDao {
         long shippingAddressId = rs.getLong("shipping_address_id");
         order.setShippingAddressId(rs.wasNull() ? null : shippingAddressId);
 
-        order.setStatus(OrderStatus.valueOf(rs.getString("status"))); // sửa ở đây
+        order.setStatus(OrderStatus.valueOf(rs.getString("status")));
         order.setTotalAmount(rs.getBigDecimal("total_amount"));
         order.setShippingFee(rs.getBigDecimal("shipping_fee"));
         order.setDiscountAmount(rs.getBigDecimal("discount_amount"));
 
+        // Map thêm cột thời gian nếu có
+        Timestamp ts = rs.getTimestamp("date_time");
+        if (ts != null) order.setDateTime(ts.toLocalDateTime().toLocalDate());
+
         return order;
     }
 
-
-    public OrdersDaoImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private OrderItems mapItemRow(ResultSet rs) throws SQLException {
+        OrderItems item = new OrderItems();
+        item.setOrderItemId(rs.getLong("order_item_id"));
+        item.setOrderId(rs.getLong("order_id"));
+        item.setProductId(rs.getLong("product_id"));
+        item.setQuantity(rs.getInt("quantity"));
+        item.setUnitPrice(rs.getBigDecimal("unit_price"));
+        item.setTotalPrice(rs.getBigDecimal("total_price"));
+        return item;
     }
 
+    private void setNullableBigDecimal(PreparedStatement st, int idx, BigDecimal val) throws SQLException {
+        if (val == null) st.setNull(idx, Types.DECIMAL);
+        else st.setBigDecimal(idx, val);
+    }
+
+    private void rollback(Connection c) {
+        try { if (c != null) c.rollback(); } catch (SQLException ignored) {}
+    }
+
+    private void close(Connection c) {
+        try { if (c != null) c.close(); } catch (SQLException ignored) {}
+    }
+
+    /* ───────────────────────── SELECT ───────────────────────── */
     @Override
-    public List<Orders> getAllOrders() {
-        String sql = "SELECT * FROM orders";
+    public List<Orders> getAllOrders(int pageNumber, int pageSize) {
+        String sql = "SELECT * FROM orders ORDER BY order_id DESC LIMIT ? OFFSET ?";
         List<Orders> list = new ArrayList<>();
 
         try (Connection c = dataSource.getConnection();
-             PreparedStatement st = c.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
+             PreparedStatement st = c.prepareStatement(sql)) {
 
-            while (rs.next()) list.add(mapRow(rs));
-        } catch (SQLException e) { throw new RuntimeException(e); }
+            st.setInt(1, pageSize);
+            st.setInt(2, (pageNumber - 1) * pageSize);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return list;
     }
 
@@ -57,25 +94,35 @@ public class OrdersDaoImpl implements OrdersDao {
         String sql = "SELECT * FROM orders WHERE order_id = ?";
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
+
             st.setLong(1, orderId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) return Optional.of(mapRow(rs));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return Optional.empty();
     }
 
     @Override
-    public List<Orders> getOrdersByUserId(long userId) {
-        String sql = "SELECT * FROM orders WHERE user_id = ?";
+    public List<Orders> getOrdersByUserId(long userId, int pageNumber, int pageSize) {
+        String sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY order_id DESC LIMIT ? OFFSET ?";
         List<Orders> list = new ArrayList<>();
+
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
+
             st.setLong(1, userId);
+            st.setInt(2, pageSize);
+            st.setInt(3, (pageNumber - 1) * pageSize);
+
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) list.add(mapRow(rs));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return list;
     }
 
@@ -84,50 +131,54 @@ public class OrdersDaoImpl implements OrdersDao {
         String sql = "SELECT * FROM orders WHERE user_id = ? AND status = 'CART' LIMIT 1";
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
+
             st.setLong(1, userId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) return Optional.of(mapRow(rs));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return Optional.empty();
     }
 
-    /* ---------- INSERT ---------- */
+    /* ───────────────────────── INSERT ───────────────────────── */
 
     @Override
     public Orders createOrder(Orders o) {
         String sql = """
-          INSERT INTO orders(user_id, shipping_address_id, status,
-                             total_amount, shipping_fee, discount_amount)
-          VALUES (?,?,?,?,?,?)""";
+            INSERT INTO orders(user_id, shipping_address_id, status,
+                               total_amount, shipping_fee, discount_amount)
+            VALUES (?,?,?,?,?,?)
+            """;
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             st.setLong(1, o.getUserId());
             if (o.getShippingAddressId() != null)
                 st.setLong(2, o.getShippingAddressId());
-            else st.setNull(2, Types.BIGINT);
+            else
+                st.setNull(2, Types.BIGINT);
 
             st.setString(3, o.getStatus().name());
-            st.setBigDecimal(4, nullable(o.getTotalAmount()));
-            st.setBigDecimal(5, nullable(o.getShippingFee()));
-            st.setBigDecimal(6, nullable(o.getDiscountAmount()));
+            setNullableBigDecimal(st, 4, o.getTotalAmount());
+            setNullableBigDecimal(st, 5, o.getShippingFee());
+            setNullableBigDecimal(st, 6, o.getDiscountAmount());
 
             st.executeUpdate();
-
             try (ResultSet rs = st.getGeneratedKeys()) {
                 if (rs.next()) o.setOrderId(rs.getLong(1));
             }
             return o;
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private BigDecimal nullable(BigDecimal v) { return v == null ? BigDecimal.ZERO : v; }
-
-    /* ---------- UPDATE ---------- */
+    /* ───────────────────────── UPDATE ───────────────────────── */
 
     @Override
-    public void updateOrder(long orderId, Orders o) {
+    public Orders updateOrder(long orderId, Orders o) {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -157,32 +208,28 @@ public class OrdersDaoImpl implements OrdersDao {
                 vals.add(o.getDiscountAmount());
             }
 
+            int updatedRows = 0;
             if (!cols.isEmpty()) {
                 String sql = "UPDATE orders SET " + String.join(", ", cols) + " WHERE order_id = ?";
                 vals.add(orderId);
 
                 try (PreparedStatement st = conn.prepareStatement(sql)) {
                     for (int i = 0; i < vals.size(); i++) st.setObject(i + 1, vals.get(i));
-                    if (st.executeUpdate() == 0) throw new SQLException("Order not found");
+                    updatedRows = st.executeUpdate();
                 }
             }
+
             conn.commit();
+
+            // Nếu không có bản ghi nào được cập nhật → trả về null
+            if (updatedRows == 0) return null;
+
+            o.setOrderId(orderId);      // Bảo đảm ID đúng
+            return o;                   // Trả lại entity đã cập nhật
         } catch (SQLException e) {
             rollback(conn);
             throw new RuntimeException(e);
         } finally { close(conn); }
-    }
-
-    /* ---------- DELETE / EXISTS ---------- */
-
-    @Override
-    public void deleteOrder(long orderId) {
-        String sql = "DELETE FROM orders WHERE order_id = ?";
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
-            st.setLong(1, orderId);
-            st.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
@@ -191,17 +238,30 @@ public class OrdersDaoImpl implements OrdersDao {
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
             st.setLong(1, orderId);
-            try (ResultSet rs = st.executeQuery()) { return rs.next(); }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /* ---------- helpers ---------- */
+    @Override
+    public List<OrderItems> getOrderItemsByOrderId(long orderId) {
+        String sql = "SELECT * FROM order_items WHERE order_id = ?";
+        List<OrderItems> list = new ArrayList<>();
 
-    private void rollback(Connection c) {
-        try { if (c != null) c.rollback(); } catch (SQLException ignored) {}
-    }
-    private void close(Connection c) {
-        try { if (c != null) c.close(); } catch (SQLException ignored) {}
-    }
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
 
+            st.setLong(1, orderId);
+
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) list.add(mapItemRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
 }

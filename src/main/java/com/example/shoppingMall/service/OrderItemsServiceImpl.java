@@ -7,7 +7,6 @@ import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
 import com.example.shoppingMall.mapper.OrderItemsMapper;
 import com.example.shoppingMall.model.OrderItems;
-import com.example.shoppingMall.service.OrderItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,22 +25,22 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     public List<OrderItemsResponse> getItemsByOrderId(long orderId) {
         return orderItemsDao.getItemsByOrderId(orderId)
                 .stream()
-                .map(orderItemsMapper::toResponse)
+                .map(orderItemsMapper::toOrderItemsResponse)
                 .toList();
     }
 
     @Override
     public OrderItemsResponse getItemById(long itemId) {
         return orderItemsDao.getItemById(itemId)
-                .map(orderItemsMapper::toResponse)
+                .map(orderItemsMapper::toOrderItemsResponse)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND));
     }
 
     @Override
     public OrderItemsResponse createItem(OrderItemsRequest request) {
-        OrderItems orderItem = orderItemsMapper.toEntity(request);
+        OrderItems orderItem = orderItemsMapper.toOrderItems(request);
         OrderItems saved = orderItemsDao.createItem(orderItem);
-        return orderItemsMapper.toResponse(saved);
+        return orderItemsMapper.toOrderItemsResponse(saved);
     }
 
     @Override
@@ -50,7 +49,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             throw new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND);
         }
 
-        OrderItems updatedItem = orderItemsMapper.toEntity(request);
+        OrderItems updatedItem = orderItemsMapper.toOrderItems(request);
         orderItemsDao.updateItem(itemId, updatedItem);
     }
 
