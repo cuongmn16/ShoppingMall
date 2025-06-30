@@ -8,7 +8,7 @@ import com.example.shoppingMall.model.Product;
 import java.util.List;
 
 public interface ProductService {
-    List<ProductResponse> getAllProducts(int pageNumber, int pageSize);
+    List<ProductResponse> getAllProducts(String search, String category, String stock, int pageNumber, int pageSize);
 
     List<ProductResponse> getAllProductsByCategoryId(long categoryId, int pageNumber, int pageSize);
 

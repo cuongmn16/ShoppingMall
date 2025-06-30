@@ -6,7 +6,7 @@ import com.example.shoppingMall.model.Product;
 import java.util.List;
 
 public interface ProductDao {
-    List<Product> getAllProducts(int pageNumber, int pageSize);
+    List<Product> getAllProducts(String search, String category, String stock, int pageNumber, int pageSize);
 
     List<Product> getAllProductsByCategory(long categoryId,int pageNumber, int pageSize);
 
