@@ -19,7 +19,7 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
     /* ---------- mapper ---------- */
     private OrderItems mapRow(ResultSet rs) throws SQLException {
         OrderItems it = new OrderItems();
-        it.setItemId(rs.getLong("item_id"));
+        it.getOrderItemId(rs.getLong("item_id"));
         it.setOrderId(rs.getLong("order_id"));
         it.setVariationId(rs.getObject("variation_id", Long.class));
         it.setProductId(rs.getLong("product_id"));
@@ -76,7 +76,7 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
             st.executeUpdate();
 
             try (ResultSet rs = st.getGeneratedKeys()) {
-                if (rs.next()) it.setItemId(rs.getLong(1));
+                if (rs.next()) it.setOrderItemId(rs.getLong(1));
             }
             return it;
         } catch (SQLException e) { throw new RuntimeException(e); }
@@ -102,7 +102,7 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
                 cols.add("product_id = ?");
                 vals.add(it.getProductId());
             }
-            if (it.getQuantity() != null) {
+            if (it.getQuantity() != 0) {
                 cols.add("quantity = ?");
                 vals.add(it.getQuantity());
             }

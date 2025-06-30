@@ -6,7 +6,7 @@ public class OrderItems {
     private long orderItemId;        // renamed from itemId
     private Long orderId;
     private Long productId;
-    private long variationId;
+    private Long variationId;
     private int quantity;
     private BigDecimal unitPrice;   // changed from double to BigDecimal
     private BigDecimal totalPrice;  // new field
@@ -14,7 +14,7 @@ public class OrderItems {
     public OrderItems() {
     }
 
-    public OrderItems(long orderItemId, Long orderId, Long productId, long variationId,
+    public OrderItems(long orderItemId, Long orderId, Long productId, Long variationId,
                       int quantity, BigDecimal unitPrice, BigDecimal totalPrice) {
         this.orderItemId = orderItemId;
         this.orderId = orderId;
@@ -49,11 +49,11 @@ public class OrderItems {
         this.productId = productId;
     }
 
-    public long getVariationId() {
+    public Long getVariationId() {
         return variationId;
     }
 
-    public void setVariationId(long variationId) {
+    public void setVariationId(Long variationId) {
         this.variationId = variationId;
     }
 
@@ -80,4 +80,8 @@ public class OrderItems {
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    public void getOrderItemId(long itemId) {
+    }
+
 }
