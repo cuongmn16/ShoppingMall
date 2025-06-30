@@ -37,21 +37,19 @@ public class OrdersDaoImpl implements OrdersDao {
         order.setShippingFee(rs.getBigDecimal("shipping_fee"));
         order.setDiscountAmount(rs.getBigDecimal("discount_amount"));
 
-        // Map thêm cột thời gian nếu có
-        Timestamp ts = rs.getTimestamp("date_time");
-        if (ts != null) order.setDateTime(ts.toLocalDateTime().toLocalDate());
+        Timestamp ts = rs.getTimestamp("create_at");
+        if (ts != null) order.setCreateAt(ts.toLocalDateTime().toLocalDate());
 
         return order;
     }
 
     private OrderItems mapItemRow(ResultSet rs) throws SQLException {
         OrderItems item = new OrderItems();
-        item.setOrderItemId(rs.getLong("order_item_id"));
+        item.setItemId(rs.getLong("item_id"));
         item.setOrderId(rs.getLong("order_id"));
         item.setProductId(rs.getLong("product_id"));
         item.setQuantity(rs.getInt("quantity"));
-        item.setUnitPrice(rs.getBigDecimal("unit_price"));
-        item.setTotalPrice(rs.getBigDecimal("total_price"));
+        item.setVariationId(rs.getLong("variation_id"));
         return item;
     }
 

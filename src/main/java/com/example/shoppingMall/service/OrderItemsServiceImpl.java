@@ -39,6 +39,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Override
     public OrderItemsResponse createItem(OrderItemsRequest request) {
         OrderItems orderItem = orderItemsMapper.toOrderItems(request);
+        System.out.println("Mapped orderId: " + orderItem.getOrderId());
         OrderItems saved = orderItemsDao.createItem(orderItem);
         return orderItemsMapper.toOrderItemsResponse(saved);
     }

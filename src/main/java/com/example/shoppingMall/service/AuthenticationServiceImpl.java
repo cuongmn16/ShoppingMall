@@ -34,6 +34,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Value("${jwt.signerKey}")
     protected  String SIGNER_KEY ;
     @Override
@@ -57,10 +60,10 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         var user = userDao.getUserByUsername(authenticationRequest.getUsername());
         if(user == null){
-             throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean authenticated =  passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
+
+        boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
         if(!authenticated){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
@@ -71,8 +74,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         authenticationResponse.setAuthenticated(true);
 
         return authenticationResponse;
-
     }
+
 
     private String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);

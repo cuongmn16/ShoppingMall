@@ -19,10 +19,10 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
     /* ---------- mapper ---------- */
     private OrderItems mapRow(ResultSet rs) throws SQLException {
         OrderItems it = new OrderItems();
-        it.getOrderItemId(rs.getLong("item_id"));
+        it.setItemId(rs.getLong("item_id"));
         it.setOrderId(rs.getLong("order_id"));
-        it.setVariationId(rs.getObject("variation_id", Long.class));
         it.setProductId(rs.getLong("product_id"));
+        it.setVariationId(rs.getLong("variation_id"));
         it.setQuantity(rs.getInt("quantity"));
         return it;
     }
@@ -61,26 +61,52 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
     @Override
     public OrderItems createItem(OrderItems it) {
         String sql = """
-          INSERT INTO order_items(order_id, variation_id, product_id, quantity)
-          VALUES (?,?,?,?)
-        """;
+      INSERT INTO order_items(order_id, product_id, variation_id, quantity)
+      VALUES (?, ?, ?, ?)
+    """;
+
         try (Connection c = dataSource.getConnection();
              PreparedStatement st = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            st.setLong(1, it.getOrderId());
-            if (it.getVariationId() != null) st.setLong(2, it.getVariationId());
-            else st.setNull(2, Types.BIGINT);
-            st.setLong(3, it.getProductId());
+            // Kiểm tra null cho orderId
+            if (it.getOrderId() != null) {
+                st.setLong(1, it.getOrderId());
+            } else {
+                st.setNull(1, Types.BIGINT);
+            }
+
+            // Kiểm tra null cho productId
+            if (it.getProductId() != null) {
+                st.setLong(2, it.getProductId());
+            } else {
+                st.setNull(2, Types.BIGINT);
+            }
+
+            // Kiểm tra null cho variationId
+            if (it.getVariationId() != null) {
+                st.setLong(3, it.getVariationId());
+            } else {
+                st.setNull(3, Types.BIGINT);
+            }
+
+            // quantity bắt buộc (nên không cần kiểm tra null nếu bạn validate trước đó)
             st.setInt(4, it.getQuantity());
 
             st.executeUpdate();
 
             try (ResultSet rs = st.getGeneratedKeys()) {
-                if (rs.next()) it.setOrderItemId(rs.getLong(1));
+                if (rs.next()) {
+                    it.setItemId(rs.getLong(1));
+                }
             }
+
             return it;
-        } catch (SQLException e) { throw new RuntimeException(e); }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     /* ---------- UPDATE ---------- */
 

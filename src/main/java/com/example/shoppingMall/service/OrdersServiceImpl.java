@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +39,14 @@ public class OrdersServiceImpl implements OrdersService {
     // Lấy tất cả đơn hàng của một user (phân trang)
     @Override
     public List<OrdersResponse> getAllOrdersByUserId(long userId, int pageNumber,  int pageSize) {
+        List<Orders> list = ordersDao.getOrdersByUserId(userId, pageNumber, pageSize);
+        if (list == null) {
+            list = new ArrayList<>(); // tránh null
+        }
+        System.out.println("==> Orders: " + list.size());
+        for (Orders o : list) {
+            System.out.println("Order ID: " + o.getOrderId() + ", status: " + o.getStatus());
+        }
         return ordersDao.getOrdersByUserId(userId, pageNumber, pageSize)
                 .stream()
                 .map(ordersMapper::toOrdersResponse)
@@ -60,8 +69,8 @@ public class OrdersServiceImpl implements OrdersService {
         response.setDiscountAmount(orderEntity.getDiscountAmount());
 
         // Nếu bạn muốn hiển thị thời gian kiểu Timestamp
-        response.setCreateAt(Timestamp.valueOf(orderEntity.getDateTime().atStartOfDay()));
-        response.setUpdateAt(Timestamp.valueOf(orderEntity.getDateTime().atStartOfDay()));
+        response.setCreateAt(Timestamp.valueOf(orderEntity.getCreateAt().atStartOfDay()));
+        response.setUpdateAt(Timestamp.valueOf(orderEntity.getCreateAt().atStartOfDay()));
 
         // Gọi OrderItems
         List<OrderItems> items = ordersDao.getOrderItemsByOrderId(orderId);

@@ -3,34 +3,26 @@ package com.example.shoppingMall.model;
 import java.math.BigDecimal;
 
 public class OrderItems {
-    private long orderItemId;        // renamed from itemId
+    private long itemId;
     private Long orderId;
     private Long productId;
     private Long variationId;
     private int quantity;
-    private BigDecimal unitPrice;   // changed from double to BigDecimal
-    private BigDecimal totalPrice;  // new field
+    private BigDecimal unitPrice;
+    private BigDecimal totalPrice;
 
     public OrderItems() {
     }
 
-    public OrderItems(long orderItemId, Long orderId, Long productId, Long variationId,
+    public OrderItems(long itemId, Long orderId, Long productId, Long variationId,
                       int quantity, BigDecimal unitPrice, BigDecimal totalPrice) {
-        this.orderItemId = orderItemId;
+        this.itemId = itemId;
         this.orderId = orderId;
         this.productId = productId;
         this.variationId = variationId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalPrice = totalPrice;
-    }
-
-    public long getOrderItemId() {
-        return orderItemId;
-    }
-
-    public void setOrderItemId(long orderItemId) {
-        this.orderItemId = orderItemId;
     }
 
     public Long getOrderId() {
@@ -81,7 +73,10 @@ public class OrderItems {
         this.totalPrice = totalPrice;
     }
 
-    public void getOrderItemId(long itemId) {
+    public long getItemId() {
+        return itemId;
     }
-
+    public void setItemId(long itemId) {
+        this.itemId = itemId;
+    }
 }

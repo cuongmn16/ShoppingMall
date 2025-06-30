@@ -13,21 +13,21 @@
         private BigDecimal totalAmount;
         private BigDecimal shippingFee;
         private BigDecimal discountAmount;
-        private LocalDate dateTime;
+        private LocalDate createAt;
         private List<OrderItems> orderItems;
         private OrderStatus status;
 
         public Orders() {
         }
 
-        public Orders(long orderId, long userId, long shippingAddressId, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate dateTime, List<OrderItems> orderItems) {
+        public Orders(long orderId, long userId, long shippingAddressId, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate createAt, List<OrderItems> orderItems) {
             this.orderId = orderId;
             this.userId = userId;
             this.shippingAddressId = shippingAddressId;
             this.totalAmount = totalAmount;
             this.shippingFee = shippingFee;
             this.discountAmount = discountAmount;
-            this.dateTime = dateTime;
+            this.createAt = createAt;
             this.orderItems = orderItems;
         }
 
@@ -79,12 +79,12 @@
             this.discountAmount = discountAmount;
         }
 
-        public LocalDate getDateTime() {
-            return dateTime;
+        public LocalDate getCreateAt() {
+            return createAt;
         }
 
-        public void setDateTime(LocalDate dateTime) {
-            this.dateTime = dateTime;
+        public void setCreateAt(LocalDate createAt) {
+            this.createAt = createAt;
         }
 
         public List<OrderItems> getOrderItems() {
