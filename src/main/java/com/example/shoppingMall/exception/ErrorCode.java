@@ -25,6 +25,7 @@ public enum ErrorCode {
     INVALID_TOKEN(1017, "Invalid token", HttpStatus.UNAUTHORIZED),
     ORDER_ITEM_NOT_FOUND(1018, "Order item not found", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(1020,"Order not found",HttpStatus.NOT_FOUND),
+    VARIATION_NOT_FOUND(1021, "Variation not found", HttpStatus.NOT_FOUND),
     ;
 
 
