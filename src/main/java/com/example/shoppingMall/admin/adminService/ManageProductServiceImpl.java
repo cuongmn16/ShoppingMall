@@ -25,17 +25,17 @@ public class ManageProductServiceImpl implements  ManageProductService {
     @Autowired
     private ProductMapper productMapper;
     @Override
-    public List<ProductResponse> getAllProductsBySellerId(HttpServletRequest request, String search, String category, String stock, int pageNumber, int pageSize) {
+    public List<ProductResponse> getAllProductsBySellerId(HttpServletRequest request, String search, String category, String stock) {
 
         String username = authenticationService.extractUsernameFromRequest(request);
         long sellerId = userDao.getSellerIdByUsername(username);
-        List<Product> products = manageProductDao.getAllProductsBySellerId(sellerId,search, category, stock, pageNumber, pageSize);
+        List<Product> products = manageProductDao.getAllProductsBySellerId(sellerId,search, category, stock);
         List<ProductResponse> productResponses = products.stream()
                 .map(productMapper::toProduct)
                 .toList();
 
         // Tính toán stats
-        long totalProducts = manageProductDao.getAllProductsBySellerId(sellerId,search, category, stock, 1, Integer.MAX_VALUE).size(); // Tổng số sản phẩm
+        long totalProducts = manageProductDao.getAllProductsBySellerId(sellerId,search, category, stock).size(); // Tổng số sản phẩm
         double totalValue = products.stream()
                 .mapToDouble(p -> p.getPrice() * p.getStockQuantity())
                 .sum();

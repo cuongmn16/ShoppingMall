@@ -4,6 +4,7 @@ import com.example.shoppingMall.dto.request.ProductRequest;
 import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.dto.response.ProductResponse;
 import com.example.shoppingMall.model.Product;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface ProductService {
 
     ProductDetailResponse getProductDetail(long productId);
 
-    ProductResponse addProduct(ProductRequest productRequest);
+    ProductResponse addProduct(HttpServletRequest request, ProductRequest productRequest);
 
     ProductResponse updateProduct(long productId, ProductRequest productRequest);
 

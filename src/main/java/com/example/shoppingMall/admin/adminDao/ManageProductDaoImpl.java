@@ -19,7 +19,7 @@ public class ManageProductDaoImpl implements  ManageProductDao {
     private DataSource dataSource;
 
     @Override
-    public List<Product> getAllProductsBySellerId(long sellerId, String search, String category, String stock, int pageNumber, int pageSize) {
+    public List<Product> getAllProductsBySellerId(long sellerId, String search, String category, String stock) {
         List<Product> products = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
         SELECT 
@@ -29,10 +29,13 @@ public class ManageProductDaoImpl implements  ManageProductDao {
             pi.image_url
         FROM products p
         LEFT JOIN product_images pi ON p.product_id = pi.product_id AND pi.is_primary = 1
-        WHERE 1=1 AND p.seller_id = ?
+        WHERE 1=1 
     """);
 
         List<Object> params = new ArrayList<>();
+        sql.append(" AND p.seller_id = ?");
+        params.add(sellerId); // Thêm sellerId vào danh sách tham số
+
         if (search != null && !search.isEmpty()) {
             sql.append(" AND (LOWER(p.product_name) LIKE ? OR LOWER(p.description) LIKE ?)");
             params.add("%" + search.toLowerCase() + "%");
@@ -50,20 +53,12 @@ public class ManageProductDaoImpl implements  ManageProductDao {
 
         sql.append(" GROUP BY p.product_id, p.seller_id, p.category_id, p.product_name, p.description, p.price, p.original_price, p.discount, p.stock_quantity, p.sold_quantity, p.rating, p.status, pi.image_url");
         sql.append(" ORDER BY COALESCE(SUM(p.sold_quantity), 0) DESC");
-        sql.append(" LIMIT ? OFFSET ?");
 
-        int offset = (pageNumber - 1) * pageSize;
-        params.add(pageSize);
-        params.add(offset);
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-
-            int index = 1;
-            stmt.setLong(index++, sellerId); // param 1
-
-            for (Object param : params) {
-                stmt.setObject(index++, param); // bắt đầu từ param 2 trở đi
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
             }
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

@@ -5,6 +5,6 @@ import com.example.shoppingMall.model.Product;
 import java.util.List;
 
 public interface ManageProductDao {
-    List<Product> getAllProductsBySellerId(long userId,String search, String category, String stock, int pageNumber, int pageSize);
+    List<Product> getAllProductsBySellerId(long userId,String search, String category, String stock);
 
 }

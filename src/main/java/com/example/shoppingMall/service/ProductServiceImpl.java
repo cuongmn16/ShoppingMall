@@ -2,12 +2,14 @@ package com.example.shoppingMall.service;
 
 
 import com.example.shoppingMall.dao.ProductDao;
+import com.example.shoppingMall.dao.UserDao;
 import com.example.shoppingMall.dto.request.ProductRequest;
 import com.example.shoppingMall.dto.response.*;
 import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
 import com.example.shoppingMall.mapper.ProductMapper;
 import com.example.shoppingMall.model.Product;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
     @Autowired
     private ProductImagesService productImagesService;
+    @Autowired
+    private AuthenticationService authenticationService;
+    @Autowired
+    private UserDao userDao;
 
 
     @Override
@@ -90,9 +96,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse addProduct(ProductRequest productRequest) {
+    public ProductResponse addProduct(HttpServletRequest request, ProductRequest productRequest) {
+        String username = authenticationService.extractUsernameFromRequest(request);
+        long sellerId = userDao.getSellerIdByUsername(username);
+        System.out.println("Seller ID: " + sellerId);
         Product product = productMapper.toProductRequest(productRequest);
-        return productMapper.toProduct( productDao.addProduct(product));
+        return productMapper.toProduct( productDao.addProduct(sellerId,product));
     }
 
     @Override

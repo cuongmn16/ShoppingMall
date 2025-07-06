@@ -12,7 +12,7 @@ public interface ProductDao {
 
     ProductDetailResponse getProductById(long productId);
 
-    Product addProduct(Product product);
+    Product addProduct(long sellerId,Product product);
 
     Product updateProduct(long productId, Product product);
 

@@ -5,6 +5,7 @@ import com.example.shoppingMall.dto.response.ApiResponse;
 import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.dto.response.ProductResponse;
 import com.example.shoppingMall.service.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,8 +68,10 @@ public class ProductController {
     }
 
     @PostMapping
-    public ApiResponse<ProductResponse> addProduct(@RequestBody ProductRequest productRequest) {
-        ProductResponse productResponse = productService.addProduct(productRequest);
+    public ApiResponse<ProductResponse> addProduct(
+            HttpServletRequest request,
+            @RequestBody ProductRequest productRequest) {
+        ProductResponse productResponse = productService.addProduct(request,productRequest);
         ApiResponse<ProductResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(productResponse);
         return apiResponse;

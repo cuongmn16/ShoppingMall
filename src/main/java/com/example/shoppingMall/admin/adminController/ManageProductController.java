@@ -24,13 +24,13 @@ public class ManageProductController {
             HttpServletRequest request,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String stock,
-            @RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "10") int pageSize
+            @RequestParam(required = false) String stock
+//            @RequestParam(defaultValue = "1") int pageNumber,
+//            @RequestParam(defaultValue = "10") int pageSize
     ) {
-        List<ProductResponse> products = manageProductService.getAllProductsBySellerId(request,search, category, stock, pageNumber, pageSize);
+        List<ProductResponse> products = manageProductService.getAllProductsBySellerId(request,search, category, stock);
         // Tính toán stats (có thể di chuyển vào service)
-        long totalProducts = manageProductService.getAllProductsBySellerId(request,search, category, stock, 1, Integer.MAX_VALUE).size();
+        long totalProducts = manageProductService.getAllProductsBySellerId(request,search, category, stock).size();
         double totalValue = products.stream()
                 .mapToDouble(p -> p.getPrice() * p.getStockQuantity())
                 .sum();
