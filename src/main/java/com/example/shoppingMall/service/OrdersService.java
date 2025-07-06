@@ -17,4 +17,7 @@ public interface OrdersService {
     OrdersResponse addOrder(OrdersRequest ordersRequest);
 
     OrdersResponse updateOrder(long orderId, OrdersRequest ordersRequest);
+
+    OrdersResponse getCartOrderByUserId(long userId);
+
 }

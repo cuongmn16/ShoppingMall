@@ -17,7 +17,7 @@ public class ProductVariationController {
     private ProductVariationService productVariationService;
 
     /** Lấy tất cả variations theo productId */
-    @GetMapping("/product/{productId}")
+        @GetMapping("/product/{productId}")
     public ApiResponse<List<ProductVariationResponse>> getVariationsByProductId(@PathVariable long productId) {
         List<ProductVariationResponse> variations = productVariationService.getVariationsByProductId(productId);
 

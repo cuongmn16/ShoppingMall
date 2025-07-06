@@ -24,4 +24,6 @@ public interface OrdersDao {
 
     List<OrderItems> getOrderItemsByOrderId(long orderId);
 
+    Orders getCartOrderByUserId(long userId);
+
 }

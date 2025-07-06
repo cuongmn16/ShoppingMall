@@ -108,4 +108,40 @@ public class OrdersServiceImpl implements OrdersService {
         }
         return ordersMapper.toOrdersResponse(updated);
     }
+
+    @Override
+    public OrdersResponse getCartOrderByUserId(long userId) {
+        Orders cart = ordersDao.getCartOrderByUserId(userId);
+
+        // map fields cơ bản
+        OrdersResponse response = new OrdersResponse();
+        response.setOrderId(cart.getOrderId());
+        response.setUserId(cart.getUserId());
+        response.setShippingAddressId(cart.getShippingAddressId());
+        response.setStatus(cart.getStatus());
+        response.setTotalAmount(cart.getTotalAmount());
+        response.setShippingFee(cart.getShippingFee());
+        response.setDiscountAmount(cart.getDiscountAmount());
+
+        // timestamp
+        if (cart.getCreateAt() != null) {
+            response.setCreateAt(Timestamp.valueOf(cart.getCreateAt().atStartOfDay()));
+            response.setUpdateAt(Timestamp.valueOf(cart.getCreateAt().atStartOfDay()));
+        }
+
+        // load orderItems
+        List<OrderItems> items = ordersDao.getOrderItemsByOrderId(cart.getOrderId());
+        List<OrderItemsResponse> itemResponses = items.stream().map(item -> {
+            OrderItemsResponse res = new OrderItemsResponse();
+            res.setVariationId(item.getVariationId());
+            res.setProductId(item.getProductId());
+            res.setQuantity(item.getQuantity());
+            return res;
+        }).toList();
+
+        response.setOrderItems(itemResponses);
+
+        return response;
+    }
+
 }
