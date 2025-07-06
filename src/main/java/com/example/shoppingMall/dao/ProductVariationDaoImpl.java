@@ -31,7 +31,7 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
     @Override
     public List<ProductVariation> findByProductId(long productId) {
         final String sql = """
-                SELECT product_variation_id, product_id, sku, price, quantity
+                SELECT variation_id, product_id, sku, price, quantity
                 FROM product_variation
                 WHERE product_id = ?
                 """;
@@ -42,7 +42,7 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 ProductVariation v = new ProductVariation();
-                v.setVariationId(rs.getLong("product_variation_id"));
+                v.setVariationId(rs.getLong("variation_id"));
                 v.setProductId(rs.getLong("product_id"));
                 v.setSku(rs.getString("sku"));
                 v.setPrice(rs.getDouble("price"));
@@ -61,11 +61,11 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
     public Map<String, List<String>> getOptionInputsOfProduct(long productId) {
         final String sql = """
                 SELECT ot.name AS type_name, ov.value AS option_value
-                FROM product_variation pv
-                JOIN product_variation_option_value pvov ON pvov.product_variation_id = pv.product_variation_id
-                JOIN option_value ov ON ov.option_value_id = pvov.option_value_id
-                JOIN option_type ot ON ot.option_type_id = ov.option_type_id
-                WHERE pv.product_id = ?
+                                FROM product_variation pv
+                                JOIN product_variation_option_value pvov ON pvov.variation_id = pv.variation_id
+                                JOIN option_value ov ON ov.option_value_id = pvov.option_value_id
+                                JOIN option_type ot ON ot.option_type_id = ov.option_type_id
+                                WHERE pv.product_id = ?
                 """;
         Map<String, Set<String>> tmp = new LinkedHashMap<>();
         try (Connection conn = dataSource.getConnection();
@@ -89,7 +89,7 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
     @Override
     public ProductVariation addVariation(ProductVariation variation) {
         String insertVarSql = "INSERT INTO product_variation (product_id, sku, price, quantity) VALUES (?,?,?,?)";
-        String insertPvovSql = "INSERT INTO product_variation_option_value (product_variation_id, option_value_id) VALUES (?,?)";
+        String insertPvovSql = "INSERT INTO product_variation_option_value (variation_id, option_value_id) VALUES (?,?)";
         try (Connection conn = dataSource.getConnection()) {
             conn.setAutoCommit(false);
 
@@ -126,9 +126,9 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
 
     @Override
     public ProductVariation updateVariation(long variationId, ProductVariation variation) {
-        String updSql = "UPDATE product_variation SET sku = ?, price = ?, quantity = ? WHERE product_variation_id = ?";
-        String delPvov = "DELETE FROM product_variation_option_value WHERE product_variation_id = ?";
-        String insPvov = "INSERT INTO product_variation_option_value (product_variation_id, option_value_id) VALUES (?,?)";
+        String updSql = "UPDATE product_variation SET sku = ?, price = ?, quantity = ? WHERE variation_id = ?";
+        String delPvov = "DELETE FROM product_variation_option_value WHERE variation_id = ?";
+        String insPvov = "INSERT INTO product_variation_option_value (variation_id, option_value_id) VALUES (?,?)";
         try (Connection conn = dataSource.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement upd = conn.prepareStatement(updSql)) {
@@ -163,8 +163,8 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
 
     @Override
     public void deleteVariation(long variationId) {
-        String delPvov = "DELETE FROM product_variation_option_value WHERE product_variation_id = ?";
-        String delVar = "DELETE FROM product_variation WHERE product_variation_id = ?";
+        String delPvov = "DELETE FROM product_variation_option_value WHERE variation_id = ?";
+        String delVar = "DELETE FROM product_variation WHERE variation_id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement pvovStmt = conn.prepareStatement(delPvov);
              PreparedStatement varStmt = conn.prepareStatement(delVar)) {
@@ -187,7 +187,7 @@ public class ProductVariationDaoImpl implements ProductVariationDao {
                 FROM product_variation_option_value pvov
                 JOIN option_value ov ON ov.option_value_id = pvov.option_value_id
                 JOIN option_type ot ON ot.option_type_id = ov.option_type_id
-                WHERE pvov.product_variation_id = ?
+                WHERE pvov.variation_id = ?
                 """;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, variationId);

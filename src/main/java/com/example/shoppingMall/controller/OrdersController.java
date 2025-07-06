@@ -48,6 +48,7 @@ public class OrdersController {
         return api;
     }
 
+
     /** Lấy chi tiết 1 đơn hàng */
     @GetMapping("/{orderId}")
     public ApiResponse<OrdersResponse> getOrderDetail(@PathVariable long orderId) {
@@ -81,4 +82,13 @@ public class OrdersController {
         api.setResult(data);
         return api;
     }
+
+    @GetMapping("/cart/{userId}")
+    public ApiResponse<OrdersResponse> getCartByUserId(@PathVariable long userId) {
+        OrdersResponse cart = ordersService.getCartOrderByUserId(userId);
+        ApiResponse<OrdersResponse> api = new ApiResponse<>();
+        api.setResult(cart);
+        return api;
+    }
+
 }

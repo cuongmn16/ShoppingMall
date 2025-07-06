@@ -261,4 +261,26 @@ public class OrdersDaoImpl implements OrdersDao {
         }
         return list;
     }
+
+    @Override
+    public Orders getCartOrderByUserId(long userId) {
+        String sql = "SELECT * FROM orders WHERE user_id = ? AND status = 'CART' LIMIT 1";
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+
+            st.setLong(1, userId);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                } else {
+                    throw new RuntimeException("No cart found for user with id = " + userId);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching cart for user " + userId, e);
+        }
+    }
+
 }

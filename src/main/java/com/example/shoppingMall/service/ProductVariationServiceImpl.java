@@ -7,7 +7,6 @@ import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
 import com.example.shoppingMall.mapper.ProductVariationMapper;
 import com.example.shoppingMall.model.ProductVariation;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

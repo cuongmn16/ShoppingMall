@@ -48,6 +48,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/api/categories/**", "/api/products/**", "/api/products/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> {})
