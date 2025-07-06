@@ -511,6 +511,22 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public long getUserIdByUsername(String username) {
+        String sql = "SELECT user_id FROM users WHERE username = ?";
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                return rs.getLong("user_id");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return -1; // Trả về -1 nếu không tìm thấy user
+    }
+
+    @Override
     public boolean isUserExistsById(String userId) {
         String sql = "SELECT COUNT(*) FROM users WHERE user_id = ?";
     try(Connection conn = dataSource.getConnection();

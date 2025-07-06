@@ -1,5 +1,8 @@
 package com.example.shoppingMall.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductImages {
     private long imageId;
     private long productId;

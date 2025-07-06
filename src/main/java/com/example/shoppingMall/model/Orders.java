@@ -1,11 +1,13 @@
     package com.example.shoppingMall.model;
 
     import com.example.shoppingMall.enums.OrderStatus;
+    import com.fasterxml.jackson.annotation.JsonInclude;
+    import org.springframework.cglib.core.Local;
 
     import java.math.BigDecimal;
     import java.time.LocalDate;
     import java.util.List;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Orders {
         private long orderId;
         private long userId;
@@ -14,13 +16,15 @@
         private BigDecimal shippingFee;
         private BigDecimal discountAmount;
         private LocalDate createAt;
+        private LocalDate updateAt;
         private List<OrderItems> orderItems;
         private OrderStatus status;
+        private Addresses shippingAddress;
 
         public Orders() {
         }
 
-        public Orders(long orderId, long userId, long shippingAddressId, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate createAt, List<OrderItems> orderItems) {
+        public Orders(long orderId, long userId, Long shippingAddressId, BigDecimal totalAmount, BigDecimal shippingFee, BigDecimal discountAmount, LocalDate createAt, LocalDate updateAt, List<OrderItems> orderItems, OrderStatus status, Addresses shippingAddress) {
             this.orderId = orderId;
             this.userId = userId;
             this.shippingAddressId = shippingAddressId;
@@ -28,7 +32,10 @@
             this.shippingFee = shippingFee;
             this.discountAmount = discountAmount;
             this.createAt = createAt;
+            this.updateAt = updateAt;
             this.orderItems = orderItems;
+            this.status = status;
+            this.shippingAddress = shippingAddress;
         }
 
         public long getOrderId() {
@@ -103,4 +110,19 @@
             this.status = status;
         }
 
+        public Addresses getShippingAddress() {
+            return shippingAddress;
+        }
+
+        public void setShippingAddress(Addresses shippingAddress) {
+            this.shippingAddress = shippingAddress;
+        }
+
+        public LocalDate getUpdateAt() {
+            return updateAt;
+        }
+
+        public void setUpdateAt(LocalDate updateAt) {
+            this.updateAt = updateAt;
+        }
     }

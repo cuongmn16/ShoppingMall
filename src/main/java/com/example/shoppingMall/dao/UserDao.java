@@ -23,6 +23,8 @@ public interface UserDao {
 
     boolean isUserExistsByEmail(String email);
 
+    long getUserIdByUsername(String username);
+
 
 
 }

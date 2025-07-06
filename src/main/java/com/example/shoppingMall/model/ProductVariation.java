@@ -1,7 +1,9 @@
 package com.example.shoppingMall.model;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductVariation {
     private long variationId;
     private long productId;

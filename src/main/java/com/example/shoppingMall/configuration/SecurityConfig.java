@@ -31,7 +31,6 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     private String signerKey;
 
-    // Những endpoint không cần token (cho login, đăng ký, swagger,...)
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/token",
             "/api/auth/introspect",
@@ -40,7 +39,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "api/**"
     };
 
     @Bean

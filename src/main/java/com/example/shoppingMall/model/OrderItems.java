@@ -1,7 +1,11 @@
 package com.example.shoppingMall.model;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderItems {
     private long itemId;
     private Long orderId;
@@ -10,12 +14,14 @@ public class OrderItems {
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private List<VariationOption> variationOptions  = new ArrayList<>();
+    private Product product;
+    private ProductVariation productVariation;
 
     public OrderItems() {
     }
 
-    public OrderItems(long itemId, Long orderId, Long productId, Long variationId,
-                      int quantity, BigDecimal unitPrice, BigDecimal totalPrice) {
+    public OrderItems(long itemId, Long orderId, Long productId, Long variationId, int quantity, BigDecimal unitPrice, BigDecimal totalPrice, List<VariationOption> variationOptions, Product product, ProductVariation productVariation) {
         this.itemId = itemId;
         this.orderId = orderId;
         this.productId = productId;
@@ -23,6 +29,9 @@ public class OrderItems {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalPrice = totalPrice;
+        this.variationOptions = variationOptions;
+        this.product = product;
+        this.productVariation = productVariation;
     }
 
     public Long getOrderId() {
@@ -78,5 +87,29 @@ public class OrderItems {
     }
     public void setItemId(long itemId) {
         this.itemId = itemId;
+    }
+
+    public List<VariationOption> getVariationOptions() {
+        return variationOptions;
+    }
+
+    public void setVariationOptions(List<VariationOption> variationOptions) {
+        this.variationOptions = variationOptions;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public ProductVariation getProductVariation() {
+        return productVariation;
+    }
+
+    public void setProductVariation(ProductVariation productVariation) {
+        this.productVariation = productVariation;
     }
 }

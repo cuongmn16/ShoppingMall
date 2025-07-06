@@ -1,5 +1,8 @@
 package com.example.shoppingMall.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OptionType {
     private long optionTypeId;
     private String name;

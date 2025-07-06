@@ -1,12 +1,13 @@
 package com.example.shoppingMall.model;
 import com.example.shoppingMall.enums.AccountStatus;
 import com.example.shoppingMall.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
     private long userId;
     private String username;

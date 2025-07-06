@@ -140,7 +140,6 @@ public class OrdersDaoImpl implements OrdersDao {
         return Optional.empty();
     }
 
-    /* ───────────────────────── INSERT ───────────────────────── */
 
     @Override
     public Orders createOrder(Orders o) {

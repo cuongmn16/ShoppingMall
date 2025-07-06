@@ -1,10 +1,11 @@
 package com.example.shoppingMall.model;
 
 import com.example.shoppingMall.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 import java.util.Map;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Product {
     private long productId;
     private long sellerId;
