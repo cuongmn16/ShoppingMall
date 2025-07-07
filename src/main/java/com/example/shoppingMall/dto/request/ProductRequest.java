@@ -19,7 +19,6 @@ public class ProductRequest {
     private long soldQuantity;
     private double rating;
     private ProductStatus productStatus;
-    private String productImage;
     private List<ProductImagesRequest> productImages;
     private List<ProductVariationsRequest> variations;
     private Map<String, List<String>> optionInputs;
@@ -27,7 +26,7 @@ public class ProductRequest {
     public ProductRequest() {
     }
 
-    public ProductRequest(long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, List<ProductImagesRequest> productImages, List<ProductVariationsRequest> variations, Map<String, List<String>> optionInputs) {
+    public ProductRequest(long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, List<ProductImagesRequest> productImages, List<ProductVariationsRequest> variations, Map<String, List<String>> optionInputs) {
         this.sellerId = sellerId;
         this.categoryId = categoryId;
         this.productName = productName;
@@ -39,7 +38,6 @@ public class ProductRequest {
         this.soldQuantity = soldQuantity;
         this.rating = rating;
         this.productStatus = productStatus;
-        this.productImage = productImage;
         this.productImages = productImages;
         this.variations = variations;
         this.optionInputs = optionInputs;
@@ -131,14 +129,6 @@ public class ProductRequest {
 
     public void setProductStatus(ProductStatus productStatus) {
         this.productStatus = productStatus;
-    }
-
-    public String getProductImage() {
-        return productImage;
-    }
-
-    public void setProductImage(String productImage) {
-        this.productImage = productImage;
     }
 
     public List<ProductImagesRequest> getProductImages() {

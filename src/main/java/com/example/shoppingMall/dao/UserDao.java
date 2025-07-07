@@ -25,6 +25,7 @@ public interface UserDao {
 
     long getUserIdByUsername(String username);
 
+    long getSellerIdByUsername(String username);
 
 
 }

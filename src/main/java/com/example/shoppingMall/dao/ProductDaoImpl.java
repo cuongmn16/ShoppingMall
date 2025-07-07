@@ -197,7 +197,7 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(long sellerId ,Product product) {
         String insertProductSql = "INSERT INTO products (seller_id, category_id, product_name, price, original_price, discount, stock_quantity, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String insertOptionTypeSql = "INSERT INTO option_type (name) VALUES (?) ON DUPLICATE KEY UPDATE option_type_id=option_type_id";
@@ -218,7 +218,7 @@ public class ProductDaoImpl implements ProductDao {
 
             // Insert vào bảng products
             try (PreparedStatement productStmt = conn.prepareStatement(insertProductSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                productStmt.setLong(1, product.getSellerId());
+                productStmt.setLong(1, sellerId);
                 productStmt.setLong(2, product.getCategoryId());
                 productStmt.setString(3, product.getProductName());
                 productStmt.setDouble(4, product.getPrice());
