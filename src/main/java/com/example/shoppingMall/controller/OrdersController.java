@@ -30,25 +30,6 @@ public class OrdersController {
         return api;
     }
 
-    /** Lấy đơn hàng của một user (phân trang) */
-    @GetMapping("/user/{userId}")
-    public ApiResponse<List<OrdersResponse>> getOrdersByUserId(
-            @PathVariable long userId,
-            @RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        ApiResponse<List<OrdersResponse>> api = new ApiResponse<>();
-        try {
-            List<OrdersResponse> data = ordersService.getAllOrdersByUserId(userId, pageNumber, pageSize);
-            api.setResult(data);
-        } catch (Exception e) {
-            e.printStackTrace(); // In log
-            api.setCode(500);
-            api.setMessage("Lỗi server: " + e.getMessage());
-        }
-        return api;
-    }
-
-
     /** Lấy chi tiết 1 đơn hàng */
     @GetMapping("/{orderId}")
     public ApiResponse<OrdersResponse> getOrderDetail(@PathVariable long orderId) {
@@ -83,12 +64,19 @@ public class OrdersController {
         return api;
     }
 
-    @GetMapping("/cart/{userId}")
-    public ApiResponse<OrdersResponse> getCartByUserId(@PathVariable long userId) {
-        OrdersResponse cart = ordersService.getCartOrderByUserId(userId);
-        ApiResponse<OrdersResponse> api = new ApiResponse<>();
-        api.setResult(cart);
+    @GetMapping("/user/{username}")
+    public ApiResponse<List<OrdersResponse>> getOrdersByUsername(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        List<OrdersResponse> data = ordersService
+                .getOrdersByUsername(username, pageNumber, pageSize);
+
+        ApiResponse<List<OrdersResponse>> api = new ApiResponse<>();
+        api.setResult(data);
         return api;
     }
+
 
 }

@@ -10,14 +10,12 @@ public interface OrdersService {
 
     List<OrdersResponse> getAllOrders(int pageNumber, int pageSize);
 
-    List<OrdersResponse> getAllOrdersByUserId(long userId, int pageNumber, int pageSize);
-
     OrdersResponse getOrderDetail(long orderId);
 
     OrdersResponse addOrder(OrdersRequest ordersRequest);
 
     OrdersResponse updateOrder(long orderId, OrdersRequest ordersRequest);
 
-    OrdersResponse getCartOrderByUserId(long userId);
+    List<OrdersResponse> getOrdersByUsername(String username, int pageNumber, int pageSize);
 
 }

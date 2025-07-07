@@ -11,17 +11,19 @@ public class OrderItems {
     private Long orderId;
     private Long productId;
     private Long variationId;
-    private int quantity;
+    private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
     private List<VariationOption> variationOptions  = new ArrayList<>();
     private Product product;
     private ProductVariation productVariation;
+    private String productName;
+    private String sku;
 
     public OrderItems() {
     }
 
-    public OrderItems(long itemId, Long orderId, Long productId, Long variationId, int quantity, BigDecimal unitPrice, BigDecimal totalPrice, List<VariationOption> variationOptions, Product product, ProductVariation productVariation) {
+    public OrderItems(long itemId, Long orderId, Long productId, Long variationId, Integer quantity, BigDecimal unitPrice, BigDecimal totalPrice, List<VariationOption> variationOptions, Product product, ProductVariation productVariation, String productName, String sku) {
         this.itemId = itemId;
         this.orderId = orderId;
         this.productId = productId;
@@ -32,6 +34,8 @@ public class OrderItems {
         this.variationOptions = variationOptions;
         this.product = product;
         this.productVariation = productVariation;
+        this.productName = productName;
+        this.sku = sku;
     }
 
     public Long getOrderId() {
@@ -58,11 +62,11 @@ public class OrderItems {
         this.variationId = variationId;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
@@ -111,5 +115,21 @@ public class OrderItems {
 
     public void setProductVariation(ProductVariation productVariation) {
         this.productVariation = productVariation;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.shoppingMall.dao;
 
+import com.example.shoppingMall.dto.response.OrderItemsResponse;
+import com.example.shoppingMall.dto.response.OrdersResponse;
 import com.example.shoppingMall.model.OrderItems;
 import com.example.shoppingMall.model.Orders;
 
@@ -10,11 +12,7 @@ public interface OrdersDao {
 
     List<Orders> getAllOrders(int pageNumber, int pageSize);
 
-    List<Orders> getOrdersByUserId(long userId, int pageNumber, int pageSize);
-
     Optional<Orders> getOrderById(long orderId);
-
-    Optional<Orders> getCartByUserId(long userId);
 
     Orders createOrder(Orders o);
 
@@ -24,6 +22,8 @@ public interface OrdersDao {
 
     List<OrderItems> getOrderItemsByOrderId(long orderId);
 
-    Orders getCartOrderByUserId(long userId);
+    List<Orders> findByUserUsername(String username, int limit, int offset);
+
+    List<OrderItemsResponse> getItemDetailsWithProductInfo(long orderId);
 
 }

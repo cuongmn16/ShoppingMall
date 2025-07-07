@@ -12,4 +12,6 @@ public interface OrderItemsMapper {
     OrderItems toOrderItems(OrderItemsRequest orderItemsRequest);
 
     OrderItemsResponse toOrderItemsResponse(OrderItems orderItems);
+
+    OrderItems toOrderItemsEntity(OrderItemsResponse dto);
 }

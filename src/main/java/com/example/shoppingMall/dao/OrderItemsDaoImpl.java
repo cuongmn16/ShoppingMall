@@ -109,46 +109,45 @@ public class OrderItemsDaoImpl implements OrderItemsDao {
 
 
     /* ---------- UPDATE ---------- */
-
     @Override
     public void updateItem(long itemId, OrderItems it) {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
 
-            List<String> cols = new ArrayList<>();
-            List<Object> vals = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("UPDATE order_items SET ");
+        List<Object> vals = new ArrayList<>();
 
-            if (it.getVariationId() != null) {
-                cols.add("variation_id = ?");
-                vals.add(it.getVariationId());
-            }
-            if (it.getProductId() != null) {
-                cols.add("product_id = ?");
-                vals.add(it.getProductId());
-            }
-            if (it.getQuantity() != 0) {
-                cols.add("quantity = ?");
-                vals.add(it.getQuantity());
-            }
+        if (it.getVariationId() != null) {
+            sql.append("variation_id = ?, ");
+            vals.add(it.getVariationId());
+        }
+        if (it.getProductId() != null) {
+            sql.append("product_id = ?, ");
+            vals.add(it.getProductId());
+        }
+        if (it.getQuantity() != null) {
+            sql.append("quantity = ?, ");
+            vals.add(it.getQuantity());
+        }
 
-            if (!cols.isEmpty()) {
-                String sql = "UPDATE order_items SET " + String.join(", ", cols) + " WHERE item_id = ?";
-                vals.add(itemId);
-                try (PreparedStatement st = conn.prepareStatement(sql)) {
-                    for (int i = 0; i < vals.size(); i++) st.setObject(i + 1, vals.get(i));
-                    if (st.executeUpdate() == 0) throw new SQLException("Item not found");
-                }
-            }
-            conn.commit();
+        /* Không field nào thay đổi? → return */
+        if (vals.isEmpty()) return;
+
+        /* xoá dấu phẩy cuối & hoàn thiện câu lệnh */
+        sql.setLength(sql.length() - 2);
+        sql.append(" WHERE item_id = ?");
+
+        vals.add(itemId);
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement st = c.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < vals.size(); i++) st.setObject(i + 1, vals.get(i));
+            if (st.executeUpdate() == 0)
+                throw new SQLException("Item not found");
         } catch (SQLException e) {
-            try { if (conn != null) conn.rollback(); } catch (SQLException ignored) {}
             throw new RuntimeException(e);
-        } finally {
-            try { if (conn != null) conn.close(); } catch (SQLException ignored) {}
         }
     }
+
 
     /* ---------- DELETE / EXISTS ---------- */
 

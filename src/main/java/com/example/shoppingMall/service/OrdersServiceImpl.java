@@ -4,17 +4,20 @@ import com.example.shoppingMall.dao.OrdersDao;
 import com.example.shoppingMall.dto.request.OrdersRequest;
 import com.example.shoppingMall.dto.response.OrderItemsResponse;
 import com.example.shoppingMall.dto.response.OrdersResponse;
+import com.example.shoppingMall.dto.response.ProductDetailResponse;
 import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
+import com.example.shoppingMall.mapper.OrderItemsMapper;
 import com.example.shoppingMall.mapper.OrdersMapper;
-import com.example.shoppingMall.model.Orders;
 import com.example.shoppingMall.model.OrderItems;
+import com.example.shoppingMall.model.Orders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.sql.Timestamp;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
@@ -26,34 +29,19 @@ public class OrdersServiceImpl implements OrdersService {
     private OrdersMapper ordersMapper;
 
     @Autowired
-    private OrderItemsService orderItemsService;   // Service để lấy danh sách OrderItems
+    private OrderItemsMapper orderItemsMapper;
+
+    @Autowired
+    private ProductService productService;
 
     @Override
-    public List<OrdersResponse> getAllOrders(int pageNumber, int pageSize) {;
+    public List<OrdersResponse> getAllOrders(int pageNumber, int pageSize) {
         return ordersDao.getAllOrders(pageNumber, pageSize)
                 .stream()
                 .map(ordersMapper::toOrdersResponse)
                 .toList();
     }
 
-    // Lấy tất cả đơn hàng của một user (phân trang)
-    @Override
-    public List<OrdersResponse> getAllOrdersByUserId(long userId, int pageNumber,  int pageSize) {
-        List<Orders> list = ordersDao.getOrdersByUserId(userId, pageNumber, pageSize);
-        if (list == null) {
-            list = new ArrayList<>(); // tránh null
-        }
-        System.out.println("==> Orders: " + list.size());
-        for (Orders o : list) {
-            System.out.println("Order ID: " + o.getOrderId() + ", status: " + o.getStatus());
-        }
-        return ordersDao.getOrdersByUserId(userId, pageNumber, pageSize)
-                .stream()
-                .map(ordersMapper::toOrdersResponse)
-                .toList();
-    }
-
-    // Lấy chi tiết đơn hàng
     @Override
     public OrdersResponse getOrderDetail(long orderId) {
         Orders orderEntity = ordersDao.getOrderById(orderId)
@@ -68,38 +56,44 @@ public class OrdersServiceImpl implements OrdersService {
         response.setShippingFee(orderEntity.getShippingFee());
         response.setDiscountAmount(orderEntity.getDiscountAmount());
 
-        // Nếu bạn muốn hiển thị thời gian kiểu Timestamp
         response.setCreateAt(Timestamp.valueOf(orderEntity.getCreateAt().atStartOfDay()));
         response.setUpdateAt(Timestamp.valueOf(orderEntity.getCreateAt().atStartOfDay()));
 
         // Gọi OrderItems
         List<OrderItems> items = ordersDao.getOrderItemsByOrderId(orderId);
-        List<OrderItemsResponse> itemResponses = items.stream().map(item -> {
+        List<OrderItemsResponse> itemResponses = new ArrayList<>();
+
+        for (OrderItems item : items) {
             OrderItemsResponse res = new OrderItemsResponse();
-            res.setVariationId(item.getVariationId());
+            res.setItemId(item.getItemId());
+            res.setOrderId(item.getOrderId());
             res.setProductId(item.getProductId());
+            res.setVariationId(item.getVariationId());
             res.setQuantity(item.getQuantity());
-            return res;
-        }).toList();
+            res.setUnitPrice(item.getUnitPrice());
+            res.setTotalPrice(item.getTotalPrice());
+
+            // Gọi productService để lấy productName và sku
+            ProductDetailResponse product = productService.getProductDetail(item.getProductId());
+            res.setProductName(product.getProductName());
+            res.setSku(product.getSku());
+
+            itemResponses.add(res);
+        }
 
         response.setOrderItems(itemResponses);
         return response;
     }
 
-    // Thêm đơn hàng mới
     @Override
     public OrdersResponse addOrder(OrdersRequest req) {
-
         Orders entity = ordersMapper.toOrders(req);
-        Orders saved  = ordersDao.createOrder(entity);
-
+        Orders saved = ordersDao.createOrder(entity);
         return ordersMapper.toOrdersResponse(saved);
     }
 
-    // Cập nhật thông tin đơn hàng
     @Override
     public OrdersResponse updateOrder(long orderId, OrdersRequest req) {
-
         Orders entity = ordersMapper.toOrders(req);
         Orders updated = ordersDao.updateOrder(orderId, entity);
 
@@ -110,38 +104,29 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public OrdersResponse getCartOrderByUserId(long userId) {
-        Orders cart = ordersDao.getCartOrderByUserId(userId);
+    public List<OrdersResponse> getOrdersByUsername(String username,
+                                                    int pageNumber,
+                                                    int pageSize) {
 
-        // map fields cơ bản
-        OrdersResponse response = new OrdersResponse();
-        response.setOrderId(cart.getOrderId());
-        response.setUserId(cart.getUserId());
-        response.setShippingAddressId(cart.getShippingAddressId());
-        response.setStatus(cart.getStatus());
-        response.setTotalAmount(cart.getTotalAmount());
-        response.setShippingFee(cart.getShippingFee());
-        response.setDiscountAmount(cart.getDiscountAmount());
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+        int offset = (pageNumber - 1) * pageSize;
 
-        // timestamp
-        if (cart.getCreateAt() != null) {
-            response.setCreateAt(Timestamp.valueOf(cart.getCreateAt().atStartOfDay()));
-            response.setUpdateAt(Timestamp.valueOf(cart.getCreateAt().atStartOfDay()));
+        List<Orders> orders = ordersDao.findByUserUsername(username, pageSize, offset);
+
+        for (Orders o : orders) {
+            List<OrderItemsResponse> detail = ordersDao.getItemDetailsWithProductInfo(o.getOrderId());
+
+            List<OrderItems> items = detail.stream()
+                    .map(orderItemsMapper::toOrderItemsEntity) // ✅ dùng đúng mapper
+                    .toList();
+
+            o.setOrderItems(items);
         }
 
-        // load orderItems
-        List<OrderItems> items = ordersDao.getOrderItemsByOrderId(cart.getOrderId());
-        List<OrderItemsResponse> itemResponses = items.stream().map(item -> {
-            OrderItemsResponse res = new OrderItemsResponse();
-            res.setVariationId(item.getVariationId());
-            res.setProductId(item.getProductId());
-            res.setQuantity(item.getQuantity());
-            return res;
-        }).toList();
-
-        response.setOrderItems(itemResponses);
-
-        return response;
+        return orders.stream()
+                .map(ordersMapper::toOrdersResponse)
+                .toList();
     }
 
 }

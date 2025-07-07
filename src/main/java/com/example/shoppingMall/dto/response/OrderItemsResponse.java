@@ -10,12 +10,15 @@ public class OrderItemsResponse {
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private String productName;
+    private String sku;
 
     public OrderItemsResponse() {
     }
 
     public OrderItemsResponse(long itemId, Long orderId, Long productId, Long variationId,
-                              int quantity, BigDecimal unitPrice, BigDecimal totalPrice) {
+                              int quantity, BigDecimal unitPrice, BigDecimal totalPrice,
+                              String productName, String sku) {
         this.itemId = itemId;
         this.orderId = orderId;
         this.productId = productId;
@@ -23,6 +26,8 @@ public class OrderItemsResponse {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalPrice = totalPrice;
+        this.productName = productName;
+        this.sku = sku;
     }
 
     public long getItemId() {
@@ -79,5 +84,21 @@ public class OrderItemsResponse {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

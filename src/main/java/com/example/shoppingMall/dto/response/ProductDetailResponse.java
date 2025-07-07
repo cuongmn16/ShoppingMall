@@ -22,12 +22,13 @@ public class ProductDetailResponse {
     private String shopName;
     private String shopDescription;
     private String shopLogo;
+    private String sku;
     private List<ProductImagesResponse> productImages;
 
     public ProductDetailResponse() {
     }
 
-    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, String shopName, String shopDescription, String shopLogo, List<ProductImagesResponse> productImages) {
+    public ProductDetailResponse(long productId, long sellerId, long categoryId, String productName, String description, double price, double originalPrice, double discount, long stockQuantity, long soldQuantity, double rating, ProductStatus productStatus, String productImage, String shopName, String shopDescription, String shopLogo, String sku, List<ProductImagesResponse> productImages) {
         this.productId = productId;
         this.sellerId = sellerId;
         this.categoryId = categoryId;
@@ -44,6 +45,7 @@ public class ProductDetailResponse {
         this.shopName = shopName;
         this.shopDescription = shopDescription;
         this.shopLogo = shopLogo;
+        this.sku = sku;
         this.productImages = productImages;
 
     }
@@ -174,6 +176,14 @@ public class ProductDetailResponse {
 
     public void setShopLogo(String shopLogo) {
         this.shopLogo = shopLogo;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
     public List<ProductImagesResponse> getProductImages() {

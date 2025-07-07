@@ -46,14 +46,18 @@ public class OrderItemsServiceImpl implements OrderItemsService {
 
     @Override
     public OrderItemsResponse updateItem(long itemId, OrderItemsRequest request) {
-        if (!orderItemsDao.getItemById(itemId).isPresent()) {
-            throw new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND);
-        }
+        orderItemsDao.getItemById(itemId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND));
+        OrderItems patch = orderItemsMapper.toOrderItems(request);
 
-        OrderItems updatedItem = orderItemsMapper.toOrderItems(request);
-        orderItemsDao.updateItem(itemId, updatedItem);
-        return null;
+        orderItemsDao.updateItem(itemId, patch);
+
+        OrderItems updated = orderItemsDao.getItemById(itemId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_ITEM_NOT_FOUND));
+
+        return orderItemsMapper.toOrderItemsResponse(updated);
     }
+
 
     @Override
     public void deleteItem(long itemId) {

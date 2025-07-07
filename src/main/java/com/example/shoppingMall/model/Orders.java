@@ -6,6 +6,7 @@
 
     import java.math.BigDecimal;
     import java.time.LocalDate;
+    import java.util.ArrayList;
     import java.util.List;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public class Orders {
@@ -17,7 +18,7 @@
         private BigDecimal discountAmount;
         private LocalDate createAt;
         private LocalDate updateAt;
-        private List<OrderItems> orderItems;
+        private List<OrderItems> orderItems = new ArrayList<>();
         private OrderStatus status;
         private Addresses shippingAddress;
 

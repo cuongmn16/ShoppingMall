@@ -60,4 +60,14 @@ public class OrderItemsController {
         api.setResult(data);
         return api;
     }
+
+    @DeleteMapping("/{itemId}")
+    public ApiResponse<Void> deleteItem(@RequestParam long itemId) {
+        orderItemsService.deleteItem(itemId);
+
+        ApiResponse<Void> api = new ApiResponse<>();
+        api.setResult(null);
+        return api;
+    }
+
 }
