@@ -19,7 +19,7 @@ public class ProductVariationServiceImpl implements ProductVariationService {
     @Autowired
     private ProductVariationDao productVariationDao;
     @Autowired
-    private ProductVariationMapper productVariationMapper;  // MapStruct hoặc tự cài thủ công
+    private ProductVariationMapper productVariationMapper;
 
     /* ---------------------- QUERY ---------------------- */
 

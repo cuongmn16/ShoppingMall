@@ -15,6 +15,8 @@ public interface ProductMapper {
 
     ProductResponse toProduct(Product product);
 
+    ProductDetailResponse toProductDetail(Product product);
+
 
 
 
