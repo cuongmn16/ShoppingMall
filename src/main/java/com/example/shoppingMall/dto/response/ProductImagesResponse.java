@@ -1,7 +1,9 @@
 package com.example.shoppingMall.dto.response;
 
+import java.util.UUID;
+
 public class ProductImagesResponse {
-    private long imageId;
+    private UUID imageId;
     private long productId;
     private String imageUrl;
     private Boolean isPrimary;
@@ -9,7 +11,7 @@ public class ProductImagesResponse {
 
     public ProductImagesResponse() {
     }
-    public ProductImagesResponse(long imageId, long productId, String imageUrl, Boolean isPrimary, long displayOrder) {
+    public ProductImagesResponse(UUID imageId, long productId, String imageUrl, Boolean isPrimary, long displayOrder) {
         this.imageId = imageId;
         this.productId = productId;
         this.imageUrl = imageUrl;
@@ -17,10 +19,10 @@ public class ProductImagesResponse {
         this.displayOrder = displayOrder;
     }
 
-    public long getImageId() {
+    public UUID getImageId() {
         return imageId;
     }
-    public void setImageId(long imageId) {
+    public void setImageId(UUID imageId) {
         this.imageId = imageId;
     }
     public long getProductId() {

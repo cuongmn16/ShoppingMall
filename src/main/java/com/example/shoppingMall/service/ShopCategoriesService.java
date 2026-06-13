@@ -4,19 +4,20 @@ import com.example.shoppingMall.dto.request.ShopCategoriesRequest;
 import com.example.shoppingMall.dto.response.ShopCategoriesResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ShopCategoriesService {
     List<ShopCategoriesResponse> getAllShopCategories();
 
-    ShopCategoriesResponse getShopCategoryById(long categoryId);
+    ShopCategoriesResponse getShopCategoryById(UUID categoryId);
 
     ShopCategoriesResponse createShopCategory(ShopCategoriesRequest shopCategoriesRequest);
 
-    void updateShopCategory(long categoryId, ShopCategoriesRequest shopCategoriesRequest);
+    ShopCategoriesResponse updateShopCategory(UUID categoryId, ShopCategoriesRequest shopCategoriesRequest);
 
-    void deleteShopCategory(long categoryId);
+    void deleteShopCategory(UUID categoryId);
 
-    List<ShopCategoriesResponse> getAllShopCategoriesByParentId(Long parentId);
-
-    List<ShopCategoriesResponse> getCategoriesByParentNull();
+//    List<ShopCategoriesResponse> getAllShopCategoriesByParentId(Long parentId);
+//
+//    List<ShopCategoriesResponse> getCategoriesByParentNull();
 }

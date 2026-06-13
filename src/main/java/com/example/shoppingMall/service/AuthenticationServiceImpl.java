@@ -1,13 +1,13 @@
 package com.example.shoppingMall.service;
 
-import com.example.shoppingMall.dao.UserDao;
 import com.example.shoppingMall.dto.request.AuthenticationRequest;
 import com.example.shoppingMall.dto.request.IntrospectRequest;
 import com.example.shoppingMall.dto.response.AuthenticationResponse;
 import com.example.shoppingMall.dto.response.IntrospectResponse;
 import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
-import com.example.shoppingMall.model.User;
+import com.example.shoppingMall.entity.User;
+import com.example.shoppingMall.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -16,9 +16,12 @@ import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,17 +31,16 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
-
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService{
-    @Autowired
-    private UserDao userDao;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    final UserRepository userRepository;
+    final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.signerKey}")
-    protected  String SIGNER_KEY ;
+    String SIGNER_KEY;
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
@@ -58,12 +60,11 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
-        var user = userDao.getUserByUsername(authenticationRequest.getUsername());
-        if(user == null){
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
+        var user = userRepository
+                .findByUsername(authenticationRequest.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(),user.getPassword());
         if(!authenticated){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }

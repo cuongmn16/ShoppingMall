@@ -4,7 +4,6 @@ import com.example.shoppingMall.dto.request.AuthenticationRequest;
 import com.example.shoppingMall.dto.request.IntrospectRequest;
 import com.example.shoppingMall.dto.response.AuthenticationResponse;
 import com.example.shoppingMall.dto.response.IntrospectResponse;
-import com.example.shoppingMall.model.User;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletRequest;
 

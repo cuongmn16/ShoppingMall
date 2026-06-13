@@ -5,6 +5,7 @@ import com.example.shoppingMall.dto.request.UserCreationRequest;
 import com.example.shoppingMall.dto.response.UserResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
 
@@ -12,11 +13,11 @@ public interface UserService {
 
     UserResponse createUser(UserCreationRequest userCreationRequest);
 
-    UserResponse updateUser(long userId, UserUpdateRequest updateUserRequest);
+    UserResponse updateUser(UUID userId, UserUpdateRequest updateUserRequest);
 
     UserResponse getMyInfo();
 
-    UserResponse getUserById(long userId);
+    UserResponse getUserById(UUID userId);
 
-    void deleteUser(long userId);
+    void deleteUser(UUID userId);
 }

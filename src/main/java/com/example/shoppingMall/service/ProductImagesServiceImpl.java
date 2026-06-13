@@ -1,69 +1,80 @@
 package com.example.shoppingMall.service;
 
-import com.example.shoppingMall.dao.ProductImagesDao;
 import com.example.shoppingMall.dto.request.ProductImagesRequest;
 import com.example.shoppingMall.dto.response.ProductImagesResponse;
+import com.example.shoppingMall.entity.Product;
 import com.example.shoppingMall.exception.AppException;
 import com.example.shoppingMall.exception.ErrorCode;
 import com.example.shoppingMall.mapper.ProductImagesMapper;
-import com.example.shoppingMall.model.ProductImages;
+import com.example.shoppingMall.entity.ProductImages;
+import com.example.shoppingMall.repository.ProductImagesRepository;
+import com.example.shoppingMall.repository.ProductRepository;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.View;
 
 import java.util.List;
-
+import java.util.UUID;
 @Service
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductImagesServiceImpl implements ProductImagesService {
 
-    @Autowired
-    private ProductImagesDao productImagesDao;
 
-    @Autowired
-    private ProductImagesMapper productImagesMapper;
-    @Autowired
-    private View error;
+    ProductImagesRepository productImagesRepository;
+
+
+    ProductImagesMapper productImagesMapper;
+
+    View error;
+    ProductRepository productRepository;
 
 
     @Override
-    public List<ProductImagesResponse> getAllProductImages(long productId) {
-        return productImagesDao.getAllProductImages(productId)
+    public List<ProductImagesResponse> getAllProductImages(UUID productId) {
+        return productImagesRepository.getAllImagesByProductId(productId)
                 .stream()
                 .map(productImagesMapper::toProductImagesResponse)
                 .toList();
     }
 
     @Override
-    public ProductImagesResponse addProductImage(long productId, ProductImagesRequest productImagesRequest) {
+    public ProductImagesResponse addProductImage(UUID productId, ProductImagesRequest productImagesRequest) {
         ProductImages productImages = productImagesMapper.toProductImages(productImagesRequest);
-        productImagesDao.addProductImage(productId, productImages);
-        return productImagesMapper.toProductImagesResponse(productImages);
+        Product product = productRepository.findById(productId)
+                        .orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        productImages.setProduct(product);
+
+        return productImagesMapper.toProductImagesResponse(productImagesRepository.save(productImages));
     }
 
 
     @Override
-    public ProductImagesResponse updateProductImage(long productId, long imageId, ProductImagesRequest productImagesRequest) {
-        ProductImages productImages = productImagesDao.getProductImageById(productId, imageId);
-        if (productImages == null || !productImagesDao.isProductImageExistsById(productId, imageId)) {
+    public ProductImagesResponse updateProductImage(UUID productId, UUID imageId, ProductImagesRequest productImagesRequest) {
+        ProductImages productImages = productImagesRepository.getProductImageByProductIdandImageId(productId, imageId);
+        if (productImages == null || !productImagesRepository.isProductImageExistsByProductIdandImageId(productId, imageId)) {
             throw new AppException(ErrorCode.PRODUCT_IMAGE_NOT_FOUND);
         }
         ProductImages updatedProductImage = productImagesMapper.toProductImages(productImagesRequest);
-        productImagesDao.updateProductImage(productId, imageId, updatedProductImage);
+        productImagesRepository.save(updatedProductImage);
         return null;
     }
 
     @Override
-    public void deleteProductImage(long productId, long imageId) {
-        if (!productImagesDao.isProductImageExistsById(productId, imageId)) {
+    public void deleteProductImage(UUID productId, UUID imageId) {
+        if (!productImagesRepository.isProductImageExistsByProductIdandImageId(productId, imageId)) {
             throw new AppException(ErrorCode.PRODUCT_IMAGE_NOT_FOUND);
         }
-        productImagesDao.deleteProductImage(productId, imageId);
+        productImagesRepository.deleteProductImage(productId, imageId);
     }
 
     @Override
-    public ProductImagesResponse getProductImageById(long productId, long imageId) {
-        ProductImages productImages = productImagesDao.getProductImageById(productId, imageId);
-        if (productImages != null || !productImagesDao.isProductImageExistsById(productId, imageId)) {
+    public ProductImagesResponse getProductImageById(UUID productId, UUID imageId) {
+        ProductImages productImages = productImagesRepository.getProductImageByProductIdandImageId(productId, imageId);
+        if (productImages != null || !productImagesRepository.isProductImageExistsByProductIdandImageId(productId, imageId)) {
             throw new AppException(ErrorCode.PRODUCT_IMAGE_NOT_FOUND);
         }
         return productImagesMapper.toProductImagesResponse(productImages);

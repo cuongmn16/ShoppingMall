@@ -1,7 +1,5 @@
 package com.example.shoppingMall.dto.request;
 
-import com.example.shoppingMall.model.Permission;
-
 import java.util.Set;
 
 public class RoleRequest {
