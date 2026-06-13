@@ -4,16 +4,17 @@ import com.example.shoppingMall.dto.request.ProductImagesRequest;
 import com.example.shoppingMall.dto.response.ProductImagesResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductImagesService {
-    List<ProductImagesResponse> getAllProductImages(long productId);
+    List<ProductImagesResponse> getAllProductImages(UUID productId);
 
-    ProductImagesResponse addProductImage(long productId, ProductImagesRequest productImagesRequest);
+    ProductImagesResponse addProductImage(UUID productId, ProductImagesRequest productImagesRequest);
 
-    ProductImagesResponse updateProductImage(long productId, long imageId, ProductImagesRequest productImagesRequest);
+    ProductImagesResponse updateProductImage(UUID productId, UUID imageId, ProductImagesRequest productImagesRequest);
 
-    void deleteProductImage(long productId, long imageId);
+    void deleteProductImage(UUID productId, UUID imageId);
 
-    ProductImagesResponse getProductImageById(long productId, long imageId);
+    ProductImagesResponse getProductImageById(UUID productId, UUID imageId);
 
 }

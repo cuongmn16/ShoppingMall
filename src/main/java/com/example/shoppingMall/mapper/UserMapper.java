@@ -5,7 +5,7 @@ import com.example.shoppingMall.dto.request.UserUpdateRequest;
 import com.example.shoppingMall.dto.response.UserResponse;
 import com.example.shoppingMall.enums.AccountStatus;
 import com.example.shoppingMall.enums.Gender;
-import com.example.shoppingMall.model.User;
+import com.example.shoppingMall.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

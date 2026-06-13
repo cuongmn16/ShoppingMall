@@ -32,6 +32,7 @@ public class SecurityConfig {
     private String signerKey;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+
             "/api/auth/token",
             "/api/auth/introspect",
             "/api/auth/logout",

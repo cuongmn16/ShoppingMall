@@ -22,20 +22,6 @@ public class ShopCategoriesController {
         return apiResponse;
     }
 
-    @GetMapping("/parent-null")
-    public ApiResponse<List<ShopCategoriesResponse>> getRootCategories() {
-        ApiResponse<List<ShopCategoriesResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(shopCategoriesService.getCategoriesByParentNull());
-        return apiResponse;
-    }
-
-
-    @GetMapping("/parent/{parentId}")
-    public ApiResponse<List<ShopCategoriesResponse>> getCategoriesByParentId(@PathVariable long parentId) {
-        ApiResponse<List<ShopCategoriesResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(shopCategoriesService.getAllShopCategoriesByParentId(parentId));
-        return apiResponse;
-    }
 
     @PostMapping
     public ApiResponse<ShopCategoriesResponse> createShopCategory(@RequestBody ShopCategoriesRequest shopCategoriesRequest) {

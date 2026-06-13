@@ -1,10 +1,10 @@
 package com.example.shoppingMall.configuration;
 
 import com.example.shoppingMall.constant.PredefinedRole;
-import com.example.shoppingMall.dao.RoleDao;
-import com.example.shoppingMall.dao.UserDao;
-import com.example.shoppingMall.model.Role;
-import com.example.shoppingMall.model.User;
+import com.example.shoppingMall.entity.Role;
+import com.example.shoppingMall.entity.User;
+import com.example.shoppingMall.repository.RoleRepository;
+import com.example.shoppingMall.repository.UserRepository;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
@@ -26,9 +26,9 @@ public class ApplicationInitConfig {
     @NonFinal
     static final String ADMIN_PASSWORD = "admin";
     @Bean
-    public ApplicationRunner applicationRunner(UserDao userDao, RoleDao roleDao) {
+    public ApplicationRunner applicationRunner(UserRepository userDao, RoleRepository roleDao) {
         return args ->{
-            if(!userDao.isUserExistsByUsername(ADMIN_USER_NAME)){
+            if(!userDao.existsByUsername(ADMIN_USER_NAME)){
 
                 Role role = new Role();
                 role.setName(PredefinedRole.USER_ROLE);
@@ -46,8 +46,11 @@ public class ApplicationInitConfig {
                 User user = new User();
                 user.setUsername(ADMIN_USER_NAME);
                 user.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
+                user.setEmail("admin@localhost.com");
+                user.setFullName("System Admin");
+                user.setAccountStatus(com.example.shoppingMall.enums.AccountStatus.ACTIVE);
                 user.setRoles(roles);
-                userDao.createUser(user);
+                userDao.save(user);
 
 
             }

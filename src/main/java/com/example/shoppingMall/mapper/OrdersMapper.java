@@ -2,7 +2,7 @@ package com.example.shoppingMall.mapper;
 
 import com.example.shoppingMall.dto.request.OrdersRequest;
 import com.example.shoppingMall.dto.response.OrdersResponse;
-import com.example.shoppingMall.model.Orders;
+import com.example.shoppingMall.entity.Orders;
 import org.mapstruct.Mapper;
 
 import java.sql.Timestamp;

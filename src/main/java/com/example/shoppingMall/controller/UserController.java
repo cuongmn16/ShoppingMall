@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -32,12 +33,11 @@ public class UserController {
         return apiResponse;
     }
     @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> getUserById(@PathVariable @Valid long userId) {
+    public ApiResponse<UserResponse> getUserById(@PathVariable @Valid UUID userId) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.getUserById(userId));
         return apiResponse;
     }
-
     @GetMapping("/myInfo")
     public ApiResponse<UserResponse> getMyInfo() {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
@@ -46,14 +46,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ApiResponse<UserResponse> deleteUser(@PathVariable long userId) {
+    public ApiResponse<UserResponse> deleteUser(@PathVariable UUID userId) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         userService.deleteUser(userId);
         apiResponse.setMessage("User deleted successfully");
         return apiResponse;
     }
     @PostMapping("/{userId}")
-    public ApiResponse<UserResponse> updateUser(@PathVariable long userId, @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
+    public ApiResponse<UserResponse> updateUser(@PathVariable UUID userId, @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.updateUser(userId, userUpdateRequest));
         return apiResponse;
